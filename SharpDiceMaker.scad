@@ -28,18 +28,18 @@ underscore_glyph = "…";
 // ^ render one die at a time, centered => use d100 for d%
 which_die = "d20"; //  ["d4","d6","d8","d10","d100","d12","d20"]
 
-// ^ the length of one of the face edges (mm)
-d4_face_length = 24; // 4 Sided
-// ^ the length of one of the face edges (mm)
-d6_face_length  = 16; // 6 Sided
-// ^ the length of one of the face edges (mm)
-d8_face_length  = 19; // 8 Sided
-// ^ the length of one of the face edges (mm) -- also used for d100
-d10_face_length = 16; // 10 Sided
-// ^ the length of one of the longest face edges (mm)
-d12_face_length  = 13; // 12 Sided
-// ^ the length of one of the face edges (mm)
-d20_face_length   = 13; // 20 Sided
+// ^ D4 face height (mm) 24 => 21 tall
+d4_face_height = 24; // 24 => 21 tall
+// ^ D6 face height (mm) 16 => 16 tall
+d6_face_height  = 16; // 16 => 16 tall
+// ^ D8 face height (mm) 18 => 26 tall
+d8_face_height  = 18; // 18 => 26 tall
+// ^ D10/D% face height (mm) 15 => 26 tall
+d10_face_height = 15; // 15 => 26 tall
+// ^ D12 longest face height (mm) 11 => 20 tall
+d12_face_height  = 11; // 11 => 20 tall
+// ^ D20 face height (mm) 11 => 20 tall
+d20_face_height  = 15; // 11 => 20 tall
 
 /* [D20 SVGs] */
 
@@ -58,8 +58,10 @@ d20_svg_offset = 0;
 
 // shorten user variable to align in arrays
 UND = underscore_glyph;
-// make 2d projection of die shape
+// true make 2d projection of the die shape
 do_projection = false;
+// true to rotate the die point down for printing
+do_rotate = false;
 
 include <shapes.scad>
 include <faces.scad>
@@ -69,7 +71,6 @@ module projectWhich(which="d4") {
   if (which=="d6") projection(cut = false) draw_d6(draw_text);
   if (which=="d8") projection(cut = false) draw_d8(draw_text);
   if (which=="d10") projection(cut = false) draw_d10(draw_text);
-  if (which=="d100") projection(cut = false) draw_d100(draw_text);
   if (which=="d12") projection(cut = false) draw_d12(draw_text);
   if (which=="d20") projection(cut = false) draw_d20(draw_text);
 }

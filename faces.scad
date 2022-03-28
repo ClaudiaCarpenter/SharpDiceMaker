@@ -12,12 +12,11 @@ module extrude_text(some_text, height, multiplier) {
 
 
 module render_svg(svg_file, svg_rotation, svg_scale, svg_offset) {
-  echo("render svg", svg_file, svg_rotation, svg_scale, svg_offset);
-translate([0, svg_offset, 0])
-  rotate([0, 0, svg_rotation])
-    scale([svg_scale, svg_scale, .1])
-      linear_extrude(height = 6 * extrude_depth)
-        import(svg_file, center = true);
+  translate([0, svg_offset, 0])
+    rotate([0, 0, svg_rotation])
+      scale([svg_scale, svg_scale, .1])
+        linear_extrude(height = 6 * extrude_depth)
+          import(svg_file, center = true);
 }
 
 
@@ -26,19 +25,22 @@ translate([0, svg_offset, 0])
 //------------------------------------------------------------------------------------
 
 module draw_d4(do_draw_text) {
-  translate([0, 0, d4_face_length * 0.2])
-    rotate([0, 180, 60]) // point down for resin printing
+
+  point_down_if_printing = do_rotate ? [0, 180, 60] : [0, 0, 210];
+  
+  translate([0, 0, d4_face_height * 0.2])
+    rotate(point_down_if_printing)
       difference() {
         intersection() {
-          tetrahedron(d4_face_length);
+          tetrahedron(d4_face_height);
           
           if (cut_corners)
             rotate([0, 180, 0])
-              tetrahedron(d4_face_length * 3 * 0.85);
+              tetrahedron(d4_face_height * 3 * 0.85);
         }
         
         if (do_draw_text)
-          draw_d4_text(d4_face_length);
+          draw_d4_text(d4_face_height);
       }
 }
 
@@ -78,20 +80,22 @@ module draw_d4_text(height) {
 //------------------------------------------------------------------------------------
 
 module draw_d6(do_draw_text) {
-  
-  translate([0, 0, d6_face_length * 0.5])
-    rotate([45, 35.264395, 0]) { // point down for resin printing
+
+  point_down_if_printing = do_rotate ? [45, 35.264395, 0] : [0, 0, 0];
+    
+  translate([0, 0, d6_face_height * 0.5])
+    rotate(point_down_if_printing) {
       difference() {
         intersection() {
-          cube([d6_face_length, d6_face_length, d6_face_length], center = true);
+          cube([d6_face_height, d6_face_height, d6_face_height], center = true);
           
           if(cut_corners)
             rotate([125, 0, 45])
-              octahedron(d6_face_length*1.625);
+              octahedron(d6_face_height*1.625);
         }
           
         if (do_draw_text)
-          draw_d6_text(d6_face_length);
+          draw_d6_text(d6_face_height);
       }
     }
 }
@@ -127,11 +131,12 @@ module draw_d6_text(height) {
 //------------------------------------------------------------------------------------
 
 module draw_d8(do_draw_text) {
-  
-  face_height = d8_face_length * 0.81654872074;
+
+  point_down_if_printing = do_rotate ? [-54.7355, 0, 0] : [35.2645, 0, 0];
+  face_height = d8_face_height * 0.81654872074;
   
   translate ([0, 0, face_height * 0.5])
-    rotate([-54.7355, 0, 0]) { // point down for resin printing
+    rotate(point_down_if_printing) {
       difference() {
         intersection() {
           octahedron(face_height);
@@ -177,19 +182,21 @@ module draw_d8_text(height) {
 //------------------------------------------------------------------------------------
 //                                       D10
 //------------------------------------------------------------------------------------
-
 module draw_d10(do_draw_text) {
+
+  point_down_if_printing = do_rotate ? [312, 0, 0] : [222, 0, 0];
+
   digits =      ["0", "1", "2", "9", "8", "3", "4", "7", "6", "5"];
   underscores = [" ", " ", " ", UND, " ", " ", " ", " ", UND, " "];
 
-  translate ([0, 0, d10_face_length * 0.5])
-   rotate([312, 0, 0]) { // point down for resin printing
+  translate ([0, 0, d10_face_height * 0.5])
+    rotate(point_down_if_printing) {
       difference() {
-        deltohedron(d10_face_length);
+        deltohedron(d10_face_height);
         
         if (draw_text)
           rotate([48, 0, 0])
-            deltohedron_text(d10_face_length, 132, 1, d10_face_length / 7, 0, digits, underscores);
+            deltohedron_text(d10_face_height, 132, 1, d10_face_height / 7, 0, digits, underscores);
       }
   }
 }
@@ -231,16 +238,18 @@ module deltohedron_text(height, angle, text_depth, text_push, text_offset,
 //------------------------------------------------------------------------------------
 
 module draw_d100(do_draw_text) {
+
+  point_down_if_printing = do_rotate ? [312, 0, 0] : [222, 0, 0];
   digits = ["40", "70", "80", "30", "20", "90", "00", "10", "60", "50"];
 
-  translate ([0, 0, d10_face_length * 0.5])
-    rotate([-54.7355, 0, 0]) { // point down for resin printing
+  translate ([0, 0, d10_face_height * 0.5])
+    rotate(point_down_if_printing) {
       difference() {
-        deltohedron(d10_face_length);
+        deltohedron(d10_face_height);
         
         if (do_draw_text)
           rotate([48, 0, 0])
-            deltohedron_text(d10_face_length, 132, 1, d10_face_length / 7, 0, digits, [], .32);
+            deltohedron_text(d10_face_height, 132, 1, d10_face_height / 7, 0, digits, [], .32);
       }
   }
 }
@@ -251,10 +260,11 @@ module draw_d100(do_draw_text) {
 
 module draw_d12(do_draw_text) {
   
-  face_height = d12_face_length * 1.42;
+  point_down_if_printing = do_rotate ? [-37.3775, 0, 0] : [-127.3775, 0, 0];
+  face_height = d12_face_height * 1.42;
 
   translate ([0, 0, face_height*0.5])
-    rotate([-37.3775, 0, 0]) { // point down for resin printing
+    rotate(point_down_if_printing) {
       difference() {
         intersection() {
           dodecahedron(face_height, 116.565, 1);
@@ -293,10 +303,10 @@ module draw_d12_text(height, slope, height_multiplier = 0.32) {
 
 module draw_d20(do_draw_text) {
   
-  face_height = d20_face_length * 1.56995960338;
+  face_height = d20_face_height * 1.56995960338;
   
   translate ([0, 0, face_height * 0.5]) 
-    rotate([35.264, 13.285, 0]) { // point down for resin printing
+    rotate([35.264, 13.285, 18]) {
       difference() {
         intersection() {
           icosahedron(face_height);
