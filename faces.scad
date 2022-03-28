@@ -26,7 +26,7 @@ module render_svg(svg_file, svg_rotation, svg_scale, svg_offset) {
 
 module draw_d4(do_draw_text) {
 
-  point_down_if_printing = do_rotate ? [0, 180, 60] : [0, 0, 210];
+  point_down_if_printing = rotate_for_printing ? [0, 180, 60] : [0, 0, 210];
   
   translate([0, 0, d4_face_height * 0.2])
     rotate(point_down_if_printing)
@@ -81,7 +81,7 @@ module draw_d4_text(height) {
 
 module draw_d6(do_draw_text) {
 
-  point_down_if_printing = do_rotate ? [45, 35.264395, 0] : [0, 0, 0];
+  point_down_if_printing = rotate_for_printing ? [45, 35.264395, 0] : [0, 0, 0];
     
   translate([0, 0, d6_face_height * 0.5])
     rotate(point_down_if_printing) {
@@ -132,7 +132,7 @@ module draw_d6_text(height) {
 
 module draw_d8(do_draw_text) {
 
-  point_down_if_printing = do_rotate ? [-54.7355, 0, 0] : [35.2645, 0, 0];
+  point_down_if_printing = rotate_for_printing ? [-54.7355, 0, 0] : [35.2645, 0, 0];
   face_height = d8_face_height * 0.81654872074;
   
   translate ([0, 0, face_height * 0.5])
@@ -184,7 +184,7 @@ module draw_d8_text(height) {
 //------------------------------------------------------------------------------------
 module draw_d10(do_draw_text) {
 
-  point_down_if_printing = do_rotate ? [312, 0, 0] : [222, 0, 0];
+  point_down_if_printing = rotate_for_printing ? [312, 0, 0] : [222, 0, 0];
 
   digits =      ["0", "1", "2", "9", "8", "3", "4", "7", "6", "5"];
   underscores = [" ", " ", " ", UND, " ", " ", " ", " ", UND, " "];
@@ -239,7 +239,7 @@ module deltohedron_text(height, angle, text_depth, text_push, text_offset,
 
 module draw_d100(do_draw_text) {
 
-  point_down_if_printing = do_rotate ? [312, 0, 0] : [222, 0, 0];
+  point_down_if_printing = rotate_for_printing ? [312, 0, 0] : [222, 0, 0];
   digits = ["40", "70", "80", "30", "20", "90", "00", "10", "60", "50"];
 
   translate ([0, 0, d10_face_height * 0.5])
@@ -260,7 +260,7 @@ module draw_d100(do_draw_text) {
 
 module draw_d12(do_draw_text) {
   
-  point_down_if_printing = do_rotate ? [-37.3775, 0, 0] : [-127.3775, 0, 0];
+  point_down_if_printing = rotate_for_printing ? [-37.3775, 0, 0] : [-127.3775, 0, 0];
   face_height = d12_face_height * 1.42;
 
   translate ([0, 0, face_height*0.5])

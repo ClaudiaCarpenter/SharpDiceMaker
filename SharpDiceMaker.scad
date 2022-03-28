@@ -25,7 +25,7 @@ underscore_glyph = "…";
 
 /* [Which Dice + Sizes] */
 
-// ^ render one die at a time, centered => use d100 for d%
+// ^ render one die at a time => use d100 for d%
 which_die = "d20"; //  ["d4","d6","d8","d10","d100","d12","d20"]
 
 // ^ D4 face height (mm) 24 => 21 tall
@@ -61,7 +61,8 @@ UND = underscore_glyph;
 // true make 2d projection of the die shape
 do_projection = false;
 // true to rotate the die point down for printing
-do_rotate = false;
+// false to rotate to longest length for projections
+rotate_for_printing = true;
 
 include <shapes.scad>
 include <faces.scad>
