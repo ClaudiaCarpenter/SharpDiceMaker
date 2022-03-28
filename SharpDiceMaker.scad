@@ -29,17 +29,17 @@ underscore_glyph = "…";
 which_die = "d20"; //  ["d4","d6","d8","d10","d100","d12","d20"]
 
 // ^ D4 face height (mm) 24 => 21 tall
-d4_face_height = 24; // 24 => 21 tall
+d4_face_edge = 24;
 // ^ D6 face height (mm) 16 => 16 tall
-d6_face_height  = 16; // 16 => 16 tall
+d6_face_edge  = 16;
 // ^ D8 face height (mm) 18 => 26 tall
-d8_face_height  = 18; // 18 => 26 tall
+d8_face_edge  = 18;
 // ^ D10/D% face height (mm) 15 => 26 tall
-d10_face_height = 15; // 15 => 26 tall
+d10_face_edge = 15;
 // ^ D12 longest face height (mm) 11 => 20 tall
-d12_face_height  = 11; // 11 => 20 tall
-// ^ D20 face height (mm) 11 => 20 tall
-d20_face_height  = 15; // 11 => 20 tall
+d12_face_edge  = 11;
+// ^ D20 face height (mm) 15 => 20 tall
+d20_face_edge  = 15;
 
 /* [D20 SVGs] */
 
@@ -53,6 +53,10 @@ d20_svg_rotation = 0;
 d20_svg_scale = 100;
 // ^ for tweaking the placement, play with this value
 d20_svg_offset = 0;
+
+/* [Wall Supports] */
+support_offset = 3;
+// ^ character to draw below 6 under 9 - needs to be bottom aligned
 
 /* [Hidden] */
 

@@ -22,11 +22,11 @@ module deltohedron(height) {
     intersection() {
         dodecahedron(height,slope,2);
         
-        if(cut_corners)
-        cylinder(
-            d=cut_modifier*height,
-            h=1.38*height,
-            center = true);
+        if (cut_corners)
+            cylinder(
+                d=cut_modifier*height,
+                h=1.38*height,
+                center = true);
     }
 }
 
@@ -35,7 +35,6 @@ module octahedron(height) {
         // Make a cube
         cube([2 * height, 2 * height, height], center = true); 
 
-        // Loop i from 0 to 2, and intersect results
         intersection_for(i = [0:2]) { 
             // Make a cube, rotate it 109.47122 degrees around the X axis,
             // then 120 * i around the Z axis
@@ -64,7 +63,7 @@ module icosahedron(height) {
 }
 
 module tetrahedron(height) {
-    scale([height, height, height]) {	// Scale by height parameter
+    scale([height, height, height]) {
         polyhedron(
             points = [
                 [-0.288675, 0.5, /* -0.27217 */ -0.20417],
@@ -81,3 +80,4 @@ module tetrahedron(height) {
         );
     }
 }
+

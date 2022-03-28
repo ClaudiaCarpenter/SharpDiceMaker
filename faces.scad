@@ -26,21 +26,22 @@ module render_svg(svg_file, svg_rotation, svg_scale, svg_offset) {
 
 module draw_d4(do_draw_text) {
 
+  z_translation = d6_face_edge * 0.91848 + support_offset;
   point_down_if_printing = rotate_for_printing ? [0, 180, 60] : [0, 0, 210];
   
-  translate([0, 0, d4_face_height * 0.2])
+  translate([0, 0, z_translation])
     rotate(point_down_if_printing)
       difference() {
         intersection() {
-          tetrahedron(d4_face_height);
+          tetrahedron(d4_face_edge);
           
           if (cut_corners)
             rotate([0, 180, 0])
-              tetrahedron(d4_face_height * 3 * 0.85);
+              tetrahedron(d4_face_edge * 3 * 0.85);
         }
         
         if (do_draw_text)
-          draw_d4_text(d4_face_height);
+          draw_d4_text(d4_face_edge);
       }
 }
 
@@ -81,21 +82,23 @@ module draw_d4_text(height) {
 
 module draw_d6(do_draw_text) {
 
-  point_down_if_printing = rotate_for_printing ? [45, 35.264395, 0] : [0, 0, 0];
+  y_rotation = atan(1/sqrt(2));
+  z_translation = d6_face_edge * 0.86603 + support_offset;
+  point_down_if_printing = rotate_for_printing ? [45, y_rotation, 0] : [0, 0, 0];
     
-  translate([0, 0, d6_face_height * 0.5])
+  translate([0, 0, z_translation])
     rotate(point_down_if_printing) {
       difference() {
         intersection() {
-          cube([d6_face_height, d6_face_height, d6_face_height], center = true);
+          cube([d6_face_edge, d6_face_edge, d6_face_edge], center = true);
           
-          if(cut_corners)
+          if (cut_corners)
             rotate([125, 0, 45])
-              octahedron(d6_face_height*1.625);
+              octahedron(d6_face_edge*1.625);
         }
           
         if (do_draw_text)
-          draw_d6_text(d6_face_height);
+          draw_d6_text(d6_face_edge);
       }
     }
 }
@@ -132,10 +135,11 @@ module draw_d6_text(height) {
 
 module draw_d8(do_draw_text) {
 
+  z_translation = d8_face_edge * 0.70715 + support_offset;
   point_down_if_printing = rotate_for_printing ? [-54.7355, 0, 0] : [35.2645, 0, 0];
-  face_height = d8_face_height * 0.81654872074;
+  face_height = d8_face_edge * 0.81654872074;
   
-  translate ([0, 0, face_height * 0.5])
+  translate ([0, 0, z_translation])
     rotate(point_down_if_printing) {
       difference() {
         intersection() {
@@ -184,19 +188,20 @@ module draw_d8_text(height) {
 //------------------------------------------------------------------------------------
 module draw_d10(do_draw_text) {
 
+  z_translation = d10_face_edge * 0.74724 + support_offset;
   point_down_if_printing = rotate_for_printing ? [312, 0, 0] : [222, 0, 0];
 
   digits =      ["0", "1", "2", "9", "8", "3", "4", "7", "6", "5"];
   underscores = [" ", " ", " ", UND, " ", " ", " ", " ", UND, " "];
 
-  translate ([0, 0, d10_face_height * 0.5])
+  translate ([0, 0, z_translation])
     rotate(point_down_if_printing) {
       difference() {
-        deltohedron(d10_face_height);
+        deltohedron(d10_face_edge);
         
         if (draw_text)
           rotate([48, 0, 0])
-            deltohedron_text(d10_face_height, 132, 1, d10_face_height / 7, 0, digits, underscores);
+            deltohedron_text(d10_face_edge, 132, 1, d10_face_edge / 7, 0, digits, underscores);
       }
   }
 }
@@ -239,17 +244,18 @@ module deltohedron_text(height, angle, text_depth, text_push, text_offset,
 
 module draw_d100(do_draw_text) {
 
+  z_translation = d10_face_edge * 0.74724 + support_offset;
   point_down_if_printing = rotate_for_printing ? [312, 0, 0] : [222, 0, 0];
   digits = ["40", "70", "80", "30", "20", "90", "00", "10", "60", "50"];
 
-  translate ([0, 0, d10_face_height * 0.5])
+  translate ([0, 0, z_translation])
     rotate(point_down_if_printing) {
       difference() {
-        deltohedron(d10_face_height);
+        deltohedron(d10_face_edge);
         
         if (do_draw_text)
           rotate([48, 0, 0])
-            deltohedron_text(d10_face_height, 132, 1, d10_face_height / 7, 0, digits, [], .32);
+            deltohedron_text(d10_face_edge, 132, 1, d10_face_edge / 7, 0, digits, [], .32);
       }
   }
 }
@@ -260,10 +266,11 @@ module draw_d100(do_draw_text) {
 
 module draw_d12(do_draw_text) {
   
+  z_translation = d12_face_edge * 0.89347 + support_offset;
   point_down_if_printing = rotate_for_printing ? [-37.3775, 0, 0] : [-127.3775, 0, 0];
-  face_height = d12_face_height * 1.42;
+  face_height = d12_face_edge * 1.42;
 
-  translate ([0, 0, face_height*0.5])
+  translate ([0, 0, z_translation])
     rotate(point_down_if_printing) {
       difference() {
         intersection() {
@@ -303,9 +310,10 @@ module draw_d12_text(height, slope, height_multiplier = 0.32) {
 
 module draw_d20(do_draw_text) {
   
-  face_height = d20_face_height * 1.56995960338;
+  z_translation = d20_face_edge * 0.9878 + support_offset;
+  face_height = d20_face_edge * 1.56995960338;
   
-  translate ([0, 0, face_height * 0.5]) 
+  translate ([0, 0, z_translation]) 
     rotate([35.264, 13.285, 18]) {
       difference() {
         intersection() {
