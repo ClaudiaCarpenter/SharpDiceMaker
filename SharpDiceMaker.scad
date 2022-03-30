@@ -55,8 +55,8 @@ d20_svg_scale = 100;
 d20_svg_offset = 0;
 
 /* [Wall Supports] */
-support_offset = 3;
-// ^ character to draw below 6 under 9 - needs to be bottom aligned
+support_offset = 3; // [0:10]
+// ^ height in mm for wall supports (0 for none)
 
 /* [Hidden] */
 
