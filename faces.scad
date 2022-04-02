@@ -25,6 +25,7 @@ module render_svg(svg_file, svg_rotation, svg_scale, svg_offset) {
 //------------------------------------------------------------------------------------
 
 module draw_d4(do_draw_text) {
+  edge_length = d4_face_edge;
 
   z_translation = d6_face_edge * 0.91848 + support_offset;
   point_down_if_printing = rotate_for_printing ? [0, 180, 60] : [0, 0, 210];
@@ -43,6 +44,16 @@ module draw_d4(do_draw_text) {
         if (do_draw_text)
           draw_d4_text(d4_face_edge);
       }
+
+  if (support_offset > 0) {
+    width = d4_face_edge;
+    height = triangle_height(d4_face_edge) * .9435;
+    render_supports(width, height, support_offset, 3);
+  }
+}
+
+module draw_d4_face(height) {
+
 }
 
 module draw_d4_text(height) {
@@ -83,10 +94,11 @@ module draw_d4_text(height) {
 module draw_d6(do_draw_text) {
 
   y_rotation = atan(1/sqrt(2));
-  z_translation = d6_face_edge * 0.86603 + support_offset;
+  die_height = d6_face_edge * sin(60);
+  z_translation = d6_face_edge * sin(60) + support_offset;
   point_down_if_printing = rotate_for_printing ? [45, y_rotation, 0] : [0, 0, 0];
     
-  translate([0, 0, z_translation])
+  translate([0, 0, die_height + support_offset])
     rotate(point_down_if_printing) {
       difference() {
         intersection() {
@@ -101,6 +113,13 @@ module draw_d6(do_draw_text) {
           draw_d6_text(d6_face_edge);
       }
     }
+
+  if (support_offset > 0) {
+    width = sqrt(d6_face_edge * d6_face_edge *2 );
+    height = d6_face_edge * 0.58;
+    rotate([0, 0, 60])
+      render_supports(width, height, support_offset, 3);
+  }
 }
 
 module draw_d6_text(height) {
@@ -155,6 +174,13 @@ module draw_d8(do_draw_text) {
         draw_d8_text(face_height);
       }
     }
+
+  if (support_offset > 0) {
+    width = d8_face_edge * 1.225;
+    height = d8_face_edge * .7075;
+    rotate([0, 0, 45])
+      render_supports(width, height, support_offset, 4);
+  }
 }
 
 module draw_d8_text(height) {
@@ -203,6 +229,13 @@ module draw_d10(do_draw_text) {
           rotate([48, 0, 0])
             deltohedron_text(d10_face_edge, 132, 1, d10_face_edge / 7, 0, digits, underscores);
       }
+  }
+
+  if (support_offset > 0) {
+    width = d10_face_edge * 1.2875;
+    height = d10_face_edge * .6685;
+    rotate([0, 0, 18])
+      render_supports(width, height, support_offset, 5);
   }
 }
 
@@ -258,6 +291,13 @@ module draw_d100(do_draw_text) {
             deltohedron_text(d10_face_edge, 132, 1, d10_face_edge / 7, 0, digits, [], .32);
       }
   }
+
+  if (support_offset > 0) {
+    width = d10_face_edge * 1.2875;
+    height = d10_face_edge * .6685;
+    rotate([0, 0, 18])
+      render_supports(width, height, support_offset, 5);
+  }
 }
 
 //------------------------------------------------------------------------------------
@@ -285,6 +325,14 @@ module draw_d12(do_draw_text) {
         draw_d12_text(face_height, 116.565);
     }
   }
+
+  if (support_offset > 0) {
+    width = d12_face_edge * 1.03;
+    height = d12_face_edge * .6685;
+    rotate([0, 0, 90])
+      render_supports(width, height, support_offset, 3);
+  }
+
 }
 
 module draw_d12_text(height, slope, height_multiplier = 0.32) {
@@ -328,6 +376,13 @@ module draw_d20(do_draw_text) {
           draw_d20_text(face_height);
       }
     }
+
+  if (support_offset > 0) {
+    width = d20_face_edge * 1.53;
+    height = d20_face_edge * .5465;
+    rotate([0, 0, 90])
+      render_supports(width, height, support_offset, 5);
+  }
 }
 
 module draw_d20_text(height) {
