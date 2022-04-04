@@ -51,10 +51,6 @@ module draw_d4(do_draw_text) {
   }
 }
 
-module draw_d4_face(height) {
-
-}
-
 module draw_d4_text(height) {
   digits = ["1", "2", "3", 
             "4", "3", "2", 
@@ -84,6 +80,63 @@ module draw_d4_text(height) {
                     extrude_text(digits[(j + 1) * 3 + i], height, height_multiplier);
             }
       }
+}
+
+//------------------------------------------------------------------------------------
+//                                      D4C
+//------------------------------------------------------------------------------------
+
+include <BOSL2/std.scad>
+include <BOSL2/shapes.scad>
+include <BOSL2/polyhedra.scad>
+
+module draw_d4_crystal(do_draw_text) {
+  d4c_body_length = 1.25 * d4c_face_edge;
+  die_height = d4c_body_length + d4c_face_edge;
+  z_translation = die_height / 2 + support_offset;
+  point_down_if_printing = rotate_for_printing ? [90, 0, 0] : [0, 0, 0];
+
+  translate([0, 0, die_height / 2 + support_offset])
+    rotate(point_down_if_printing) {
+      difference() {
+        union() {
+          cuboid([d4c_face_edge, d4c_body_length, d4c_face_edge]);
+
+          translate([0, -d4c_body_length / 2, 0])
+            rotate([90, 90, 0])
+              prismoid([d4c_face_edge, d4c_face_edge], [0, 0], h=d4c_face_edge / 2);
+
+          mirror([0, 1, 0])
+            translate([0, -d4c_body_length / 2, 0])
+              rotate([90, 90, 0])
+                prismoid([d4c_face_edge, d4c_face_edge], [0, 0], h=d4c_face_edge / 2);
+        }
+
+        if (do_draw_text)
+          draw_d4c_text(d4c_face_edge);
+      }
+    }
+
+  if (support_offset > 0) {
+    width = 1.22474 * d4c_face_edge;
+    height = 1.15455 * triangle_height(d4c_face_edge/2);
+    rotate([0, 0, 45])
+      render_supports(width, height, support_offset, 4);
+  }
+
+}
+
+module draw_d4c_text(height) {
+  height_multiplier = 0.75;
+  digits = ["3", "4", "2", "1"];
+  for (i = [0:3]) { 
+    rotate([0, 90*i, 0])
+      rotate([90, 90, 90]) {
+        translate([0, 0, 0.5 * height - 1])
+          extrude_text(digits[i], height, height_multiplier);
+      }
+  }
+
 }
 
 //------------------------------------------------------------------------------------

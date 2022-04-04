@@ -26,44 +26,58 @@ underscore_glyph = "_";
 /* [Which Dice + Sizes] */
 
 // ^ render one die at a time => use d100 for d%
-which_die = "d20"; //  ["d4","d6","d8","d10","d100","d12","d20"]
+which_die = "d20"; //  ["d4","d4c","d6","d8","d10","d100","d12","d20"]
 
 // ^ D4 face height (mm) 21 => 17 tall
 d4_face_edge = 21;
+
+// ^ D4 face height (mm) 12 => 27 tall
+d4c_face_edge = 12;
+
 // ^ D6 face height (mm) 16 => 16 tall
 d6_face_edge  = 16;
-// ^ D8 face height (mm) 18 => 26 tall
+
+// ^ D8 face height (mm) 18 => 25.5 tall
 d8_face_edge  = 18;
-// ^ D10/D% face height (mm) 15 => 26 tall
+
+// ^ D10/D% face height (mm) 15 => 22.5 tall
 d10_face_edge = 15;
-// ^ D12 longest face height (mm) 11 => 21 tall
+
+// ^ D12 longest face height (mm) 13 => 23 tall
 d12_face_edge  = 13;
-// ^ D20 face height (mm) 13 => 26 tall
+
+// ^ D20 face height (mm) 13 => 23 tall
 d20_face_edge  = 13;
 
 /* [D20 SVGs] */
 
 // ^ to replace a digit on your d20 with an svg, first slide to a number between 1 and 20
 d20_svg_replace_digit = 0; // [0:20]
+
 // ^ then, enter the path to the file:
 d20_svg_file = "svg/scull_crossbones.svg";
+
 // ^ helpful if the svg has an end that's wider than the other
 d20_svg_rotation = 0;
+
 // ^ percentage sizing scale
 d20_svg_scale = 100;
+
 // ^ for tweaking the placement, play with this value
 d20_svg_offset = 0;
 
 /* [Wall Supports] */
-support_offset = 0; // [0:10]
+support_offset = 3; // [0:10]
 // ^ height in mm for wall supports (0 for none)
 
 /* [Hidden] */
 
 // shorten user variable to align in arrays
 UND = underscore_glyph;
+
 // true make 2d projection of the die shape
 do_projection = false;
+
 // true to rotate the die point down for printing
 // false to rotate to longest length for projections
 rotate_for_printing = true;
@@ -73,6 +87,7 @@ include <faces.scad>
 
 module projectWhich(which="d4") {
   if (which=="d4") projection(cut = false) draw_d4(draw_text);
+  if (which=="d4c") projection(cut = false) draw_d4_crystal(draw_text);
   if (which=="d6") projection(cut = false) draw_d6(draw_text);
   if (which=="d8") projection(cut = false) draw_d8(draw_text);
   if (which=="d10") projection(cut = false) draw_d10(draw_text);
@@ -82,6 +97,7 @@ module projectWhich(which="d4") {
 
 module drawWhich(which="d4") {
   if (which=="d4") draw_d4(draw_text);
+  if (which=="d4c") draw_d4_crystal(draw_text);
   if (which=="d6") draw_d6(draw_text);
   if (which=="d8") draw_d8(draw_text);
   if (which=="d10") draw_d10(draw_text);

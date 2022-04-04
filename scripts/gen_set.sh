@@ -3,7 +3,7 @@ PRESETS="./SharpDiceMaker.json"
 
 gen_die() {
   echo
-  echo $1p.stl...
+  echo $1.stl...
   $OPENSCAD -o ./dice/$1.stl -D "which_die=\"$1\"" -p $PRESETS  -P "sutro supports" SharpDiceMaker.scad
 }
 
@@ -15,6 +15,7 @@ echo
 echo Generating supported dice
 
 gen_die d4
+gen_die d4c
 gen_die d6
 gen_die d8
 gen_die d10

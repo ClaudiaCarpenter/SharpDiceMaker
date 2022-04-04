@@ -81,23 +81,35 @@ module tetrahedron(height) {
     }
 }
 
+//------------------------------------------------------------------------------------
+//                                  BASES FOR MOLDING
+//------------------------------------------------------------------------------------
+
+//------------------------------------------------------------------------------------
+//                                SUPPORTS FOR PRINTING
+//------------------------------------------------------------------------------------
+
 module render_supports(length, height, support_offset, num = 3, add_tall_supports = false) {
   rotate_by = 360 / num;
   
   // thin support that touches the die
   for (i = [0 : num])
-    rotate([0, 0, i * rotate_by]) render_support(length, height, 0.2, support_offset);
+    rotate([0, 0, i * rotate_by]) 
+      render_support(length, height, 0.2, support_offset);
 
   // thicker support added for stability, offset by enough space to cut cleanly
-  offset_height = height - 2;
-  for (i = [0 : num])
-    rotate([0, 0, i * rotate_by]) render_support(length, offset_height, 1, 0);
+ for (i = [0 : num])
+    rotate([0, 0, i * rotate_by]) 
+      translate([0, 0, -2])
+        render_support(length, height, 1, support_offset);
   
   // support raft that sits on the bed
   for (i = [0 : num])
-    rotate([0, 0, i * rotate_by]) render_base(length, height, support_offset, add_tall_supports);
+    rotate([0, 0, i * rotate_by]) 
+      render_base(length, height, support_offset, add_tall_supports);
 }
 
+//------------------------------------------------------------------------------------
 support_color = "#EFEFEF";
 module render_support(length, height, depth, support_offset = 0) {
   midpoint = triangle_midpoint(length);
@@ -115,6 +127,7 @@ module render_support(length, height, depth, support_offset = 0) {
         polygon(points = points);
 }
 
+//------------------------------------------------------------------------------------
 module render_base(length, height, width, add_tall_supports = false) {
   midpoint = triangle_midpoint(length);
   
@@ -136,6 +149,7 @@ module render_base(length, height, width, add_tall_supports = false) {
   }
 }
 
+//------------------------------------------------------------------------------------
 module render_tall_support(length, height, width) {
   midpoint = length / 2;
   

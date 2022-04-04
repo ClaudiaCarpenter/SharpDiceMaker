@@ -15,6 +15,7 @@ echo
 echo Generating plain dice
 
 gen_die d4
+gen_die d4c
 gen_die d6
 gen_die d8
 gen_die d10
