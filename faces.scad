@@ -380,7 +380,7 @@ module draw_d12(do_draw_text) {
 
   if (support_offset > 0) {
     width = d12_face_edge * 1.03;
-    height = d12_face_edge * .6685;
+    height = d12_face_edge * .226;
     rotate([0, 0, 90])
       render_supports(width, height, support_offset, 3, true);
   }
@@ -413,7 +413,7 @@ module draw_d20(do_draw_text) {
   z_translation = d20_face_edge * 0.9878 + support_offset;
   face_height = d20_face_edge * 1.56995960338;
   
-  translate ([0, 0, z_translation]) 
+  *translate ([0, 0, z_translation]) 
     rotate([35.264, 13.285, 18]) {
       difference() {
         intersection() {
@@ -491,6 +491,6 @@ module draw_d20_text_face(height, digit, underscore) {
         extrude_text(digit, height, height_multiplier);    
       
   rotate([0, 0, 39])
-    translate([0, -(5 * font_scale / 100 / 2.7), 0.5 * height - 1])
+    translate([0, -(5 * font_scale / 100 / 2.5), 0.5 * height - 1])
       extrude_text(underscore, height, height_multiplier);      
 }

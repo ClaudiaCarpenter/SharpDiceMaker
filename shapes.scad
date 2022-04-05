@@ -84,92 +84,116 @@ module tetrahedron(height) {
 //------------------------------------------------------------------------------------
 //                                  BASES FOR MOLDING
 //------------------------------------------------------------------------------------
+module regular_polygon(order = 4, r = 1){
+     angles=[ for (i = [0:order-1]) i*(360/order) ];
+     coords=[ for (th=angles) [r*cos(th), r*sin(th)] ];
+     polygon(coords);
+ }
 
 //------------------------------------------------------------------------------------
 //                                SUPPORTS FOR PRINTING
 //------------------------------------------------------------------------------------
+base_height = 2;
+support_color = "black";
 
 module render_supports(length, height, support_offset, num = 3, add_tall_supports = false) {
   rotate_by = 360 / num;
   
-  // thin support that touches the die
-  for (i = [0 : num])
-    rotate([0, 0, i * rotate_by]) 
-      render_support(length, height, 0.2, support_offset);
+  // thin fin that touches the die
+  color(support_color, 1) 
+    for (i = [0 : num])
+      rotate([0, 0, i * rotate_by]) 
+        render_support(length, height+.1, 0.2, support_offset);
 
-  // thicker support added for stability, offset by enough space to cut cleanly
- for (i = [0 : num])
-    rotate([0, 0, i * rotate_by]) 
-      translate([0, 0, -2])
-        render_support(length, height, 1, support_offset);
-  
-  // support raft that sits on the bed
-  for (i = [0 : num])
-    rotate([0, 0, i * rotate_by]) 
-      render_base(length, height, support_offset, add_tall_supports);
+  // step-wise, angled taper for added stability
+  color(support_color, .5) 
+    for (i = [0 : num])
+      rotate([0, 0, i * rotate_by]) {
+        for (j = [0 : 5])
+          translate([0, 0, -1])
+            render_support(length, height-j, 0.2*(j+1), support_offset);
+      }
+      
+  // support raft that sits on the bed plus extension for the D12
+  if (add_tall_supports)
+    color(support_color, 0.5) 
+      for (i = [0 : num])
+        rotate([0, 0, i * rotate_by]) 
+          render_base(length, height, support_offset, support_offset, add_tall_supports);
 }
 
 //------------------------------------------------------------------------------------
-support_color = "#EFEFEF";
 module render_support(length, height, depth, support_offset = 0) {
   midpoint = triangle_midpoint(length);
+  clip_by = .1;
   
-  points = [
+  triangle_points = [
       [0, 0],                               // lower left
       [0, support_offset],                  // upper left
       [midpoint, height + support_offset],  // upper right 
       [midpoint, 0]                         // lower right
   ];
 
-  color(support_color, .8) 
-    rotate([90, 0, 0]) 
-      linear_extrude(height=depth, center = true) 
-        polygon(points = points);
+  clipping_points = [
+      [clip_by, 0],                                   // lower left
+      [clip_by, height + support_offset],             // upper left
+      [midpoint, height + support_offset],  // upper right 
+      [midpoint, 0]                         // lower right
+  ];
+
+  rotate([90, 0, 0]) 
+    linear_extrude(height=depth, center = true)
+      intersection() {
+        polygon(points = triangle_points);
+        polygon(points = clipping_points);
+      }
 }
 
 //------------------------------------------------------------------------------------
-module render_base(length, height, width, add_tall_supports = false) {
+module render_base(length, height, width, support_offset = 0, add_tall_supports = false) {
   midpoint = triangle_midpoint(length);
+  size = length / 2;
   
   base_length = add_tall_supports ? midpoint * 1.5 : midpoint;
   points = [
       [0, 0],         
-      [0, 2],         
-      [base_length, 2], 
+      [0, base_height],         
+      [base_length, base_height], 
       [base_length, 0]
   ];
 
-  color(support_color) 
+  color(support_color, .5) 
     rotate([90, 0, 0]) 
-      linear_extrude(height = width, center = true) 
+      linear_extrude(height = size, center = true) 
         polygon(points = points);
 
   if (add_tall_supports) {
-    render_tall_support(length, height, width);
+    render_tall_support(length, height, width, support_offset, base_length);
   }
 }
 
 //------------------------------------------------------------------------------------
-module render_tall_support(length, height, width) {
+module render_tall_support(length, height, width, support_offset, base_length) {
   midpoint = length / 2;
-  
+
   points = [
       [-midpoint / 2, 0],
-      [-midpoint / 2, 2],
-      [midpoint / 2, 2],
+      [-midpoint / 2, length / 5],
+      [midpoint / 2, length / 5],
       [midpoint / 2, 0]
   ];
 
-  tall_top = 1.545*(height + support_offset);
+  tall_top = 5.264*height + support_offset;
+
   color(support_color) 
     rotate([0, 0, 90]) 
-      translate([0, -length*.9, tall_top])
+      translate([0, -(base_length), tall_top])
         linear_extrude(height = .2, center = true) 
           polygon(points = points);
 
   color(support_color) 
     rotate([0, 0, 90]) 
-      translate([0, -.9*length, 0])
+      translate([0, -(base_length), 0])
         linear_extrude(height = (tall_top + .1)) 
         scale([1, .25, 1])
           polygon(points = points);

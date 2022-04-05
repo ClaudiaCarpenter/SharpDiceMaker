@@ -68,7 +68,7 @@
             "font_scale": "125",
             "font_two_digit_spacing": "90",
             "rotate_for_printing": "true",
-            "support_offset": "3",
+            "support_offset": "5",
             "underscore_glyph": "."
         }
 

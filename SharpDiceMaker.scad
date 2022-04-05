@@ -96,14 +96,20 @@ module projectWhich(which="d4") {
 }
 
 module drawWhich(which="d4") {
-  if (which=="d4") draw_d4(draw_text);
-  if (which=="d4c") draw_d4_crystal(draw_text);
-  if (which=="d6") draw_d6(draw_text);
-  if (which=="d8") draw_d8(draw_text);
-  if (which=="d10") draw_d10(draw_text);
-  if (which=="d100") draw_d100(draw_text);
-  if (which=="d12") draw_d12(draw_text);
-  if (which=="d20") draw_d20(draw_text);
+  intersection() {
+    if (which=="d4") draw_d4(draw_text);
+    if (which=="d4c") draw_d4_crystal(draw_text);
+    if (which=="d6") draw_d6(draw_text);
+    if (which=="d8") draw_d8(draw_text);
+    if (which=="d10") draw_d10(draw_text);
+    if (which=="d100") draw_d100(draw_text);
+    if (which=="d12") draw_d12(draw_text);
+    if (which=="d20") draw_d20(draw_text);
+
+    // cut off anything below z=0
+    cylinder(100, 100, 1000);
+  }
+
 }
 
 if (do_projection)
