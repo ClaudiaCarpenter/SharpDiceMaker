@@ -20,7 +20,7 @@
             "font_scale": "100",
             "font_two_digit_spacing": "100",
             "rotate_for_printing": "true",
-            "support_offset": "0",
+            "support_height": "0",
             "underscore_glyph": "_",
             "which_die": "d20"
         },
@@ -44,7 +44,7 @@
             "font_scale": "125",
             "font_two_digit_spacing": "90",
             "rotate_for_printing": "true",
-            "support_offset": "0",
+            "support_height": "0",
             "underscore_glyph": "."
         }
         ,
@@ -68,7 +68,7 @@
             "font_scale": "125",
             "font_two_digit_spacing": "90",
             "rotate_for_printing": "true",
-            "support_offset": "5",
+            "support_height": "5",
             "underscore_glyph": "."
         }
 

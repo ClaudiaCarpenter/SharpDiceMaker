@@ -1,4 +1,4 @@
-module dodecahedron(height,slope,cutoff) {
+module dodecahedron(height, slope, cutoff) {
     intersection() {
         // Make a cube
         cube([2 * height, 2 * height, cutoff * height], center = true); 
@@ -15,12 +15,11 @@ module dodecahedron(height,slope,cutoff) {
 }
 
 module deltohedron(height) {
-    slope = 132;
     cut_modifier = 1.43;
     
     rotate([48, 0, 0])
     intersection() {
-        dodecahedron(height,slope,2);
+        dodecahedron(height, d10_angle, 2);
         
         if (cut_corners)
             cylinder(

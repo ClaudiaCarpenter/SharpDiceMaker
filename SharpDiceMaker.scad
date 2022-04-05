@@ -67,13 +67,16 @@ d20_svg_scale = 100;
 d20_svg_offset = 0;
 
 /* [Wall Supports] */
-support_offset = 3; // [0:10]
+supports_height = 3; // [0:10]
 // ^ height in mm for wall supports (0 for none)
 
 /* [Hidden] */
 
 // shorten user variable to align in arrays
 UND = underscore_glyph;
+
+// true to hollow out the die and cut in half
+do_hollow = false;
 
 // true make 2d projection of the die shape
 do_projection = false;
@@ -82,37 +85,37 @@ do_projection = false;
 // false to rotate to longest length for projections
 rotate_for_printing = true;
 
+d10_angle = 120; // original: 132
+
 include <shapes.scad>
 include <faces.scad>
 
-module projectWhich(which="d4") {
-  if (which=="d4") projection(cut = false) draw_d4(draw_text);
-  if (which=="d4c") projection(cut = false) draw_d4_crystal(draw_text);
-  if (which=="d6") projection(cut = false) draw_d6(draw_text);
-  if (which=="d8") projection(cut = false) draw_d8(draw_text);
-  if (which=="d10") projection(cut = false) draw_d10(draw_text);
-  if (which=="d12") projection(cut = false) draw_d12(draw_text);
-  if (which=="d20") projection(cut = false) draw_d20(draw_text);
-}
-
 module drawWhich(which="d4") {
   intersection() {
-    if (which=="d4") draw_d4(draw_text);
-    if (which=="d4c") draw_d4_crystal(draw_text);
-    if (which=="d6") draw_d6(draw_text);
-    if (which=="d8") draw_d8(draw_text);
-    if (which=="d10") draw_d10(draw_text);
-    if (which=="d100") draw_d100(draw_text);
-    if (which=="d12") draw_d12(draw_text);
-    if (which=="d20") draw_d20(draw_text);
+    if (which=="d4") draw_d4(d4_face_edge, supports_height, draw_text);
+    if (which=="d4c") draw_d4_crystal(d4c_face_edge, supports_height, draw_text);
+    if (which=="d6") draw_d6(d6_face_edge, supports_height, draw_text);
+    if (which=="d8") draw_d8(d8_face_edge, supports_height, draw_text);
+    if (which=="d10")  draw_d10(d10_face_edge, supports_height, false, draw_text);
+    if (which=="d100") draw_d10(d10_face_edge, supports_height, true, draw_text);
+    if (which=="d12") draw_d12(d12_face_edge, supports_height, draw_text);
+    if (which=="d20") draw_d20(d20_face_edge, supports_height, draw_text);
 
     // cut off anything below z=0
     cylinder(100, 100, 1000);
   }
-
 }
 
-if (do_projection)
+module drawHollowD4() {
+  difference() {
+    draw_d4(d4_face_edge, supports_height = 0, draw_text = false);
+    draw_d4(d4_face_edge-1, supports_height = 0, draw_text = false);
+  }
+}
+
+if (do_hollow)
+  drawHollowD4(which_die);
+else if (do_projection)
   projectWhich(which_die);
 else
   drawWhich(which_die);
