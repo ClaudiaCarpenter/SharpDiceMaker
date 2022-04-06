@@ -1,4 +1,4 @@
-//------------------------------------------
+//////------------------------------------------
 // Dnd Sharp Dice Renderer
 //------------------------------------------
 
@@ -51,20 +51,23 @@ d20_face_edge  = 13;
 
 /* [D20 SVGs] */
 
-// ^ to replace a digit on your d20 with an svg, first slide to a number between 1 and 20
-d20_svg_replace_digit = 0; // [0:20]
+// ^ to replace a digit on your d20 with an svg or text, first pick which digit:
+d20_replace_digit = 1; // [0:20]
 
-// ^ then, enter the path to the file:
+// ^ then, enter the text:
+d20_text = "";
+
+// ^ OR enter the path to the file:
 d20_svg_file = "svg/scull_crossbones.svg";
 
 // ^ helpful if the svg has an end that's wider than the other
-d20_svg_rotation = 0;
+d20_face_rotation = 0;
 
 // ^ percentage sizing scale
-d20_svg_scale = 100;
+d20_face_scale = 100;
 
 // ^ for tweaking the placement, play with this value
-d20_svg_offset = 0;
+d20_face_offset = 0;
 
 /* [Wall Supports] */
 supports_height = 3; // [0:10]
@@ -76,7 +79,7 @@ supports_height = 3; // [0:10]
 UND = underscore_glyph;
 
 // true to hollow out the die and cut in half
-do_hollow = false;
+see_supports = false;
 
 // true make 2d projection of the die shape
 do_projection = false;
@@ -102,20 +105,12 @@ module drawWhich(which="d4") {
     if (which=="d20") draw_d20(d20_face_edge, supports_height, draw_text);
 
     // cut off anything below z=0
-    cylinder(100, 100, 1000);
+    translate([0, 0, 50])
+      cylinder(h=100, r1=100, r2=100, center = true);
   }
 }
 
-module drawHollowD4() {
-  difference() {
-    draw_d4(d4_face_edge, supports_height = 0, draw_text = false);
-    draw_d4(d4_face_edge-1, supports_height = 0, draw_text = false);
-  }
-}
-
-if (do_hollow)
-  drawHollowD4(which_die);
-else if (do_projection)
+if (do_projection)
   projectWhich(which_die);
 else
   drawWhich(which_die);

@@ -5,20 +5,19 @@
 function calc_spacing(digits) = len(digits) > 1 ? font_two_digit_spacing / 100 : 1;
 
 module extrude_text(some_text, height, multiplier) {
-  translate([len(some_text) > 1 ? -(100 - font_two_digit_spacing) / 100: 0, 0, 0])
-    linear_extrude(height = extrude_depth)
+  translate([len(some_text) > 1 ? -(100 - font_two_digit_spacing) / 100: 0, 0, -extrude_depth + 1])
+    linear_extrude(height = extrude_depth + 1)
       text(some_text, size = height * multiplier * font_scale / 100, spacing = calc_spacing(some_text), valign="center", halign="center", font=font);
 }
 
 
 module render_svg(svg_file, svg_rotation, svg_scale, svg_offset) {
-  translate([0, svg_offset, 0])
+  translate([0, svg_offset, -extrude_depth + 1])
     rotate([0, 0, svg_rotation])
-      scale([svg_scale, svg_scale, .1])
-        linear_extrude(height = 6 * extrude_depth)
+      scale([svg_scale, svg_scale, 1])
+        linear_extrude(height = extrude_depth + 1)
           import(svg_file, center = true);
 }
-
 
 //------------------------------------------------------------------------------------
 //                                       D4
@@ -33,7 +32,7 @@ module draw_d4(face_edge, support_height, do_draw_text) {
     rotate(point_down_if_printing)
       difference() {
         intersection() {
-          tetrahedron(face_edge);
+          tetrahedron(face_edge, see_supports);
           
           if (cut_corners)
             rotate([0, 180, 0])
@@ -46,7 +45,7 @@ module draw_d4(face_edge, support_height, do_draw_text) {
 
   if (support_height > 0) {
     width = face_edge;
-    height = triangle_height(face_edge) * .9435;
+    height = triangle_height(face_edge) * .95;
     render_supports(width, height, support_height, 3);
   }
 }
@@ -92,25 +91,15 @@ include <BOSL2/polyhedra.scad>
 
 module draw_d4_crystal(face_edge, support_height, do_draw_text) {
   d4c_body_length = 1.25 * face_edge;
-  die_height = d4c_body_length + face_edge;
+  end_height = face_edge / 1.25;
+  die_height = d4c_body_length + end_height * 2;
   z_translation = die_height / 2 + support_height;
   point_down_if_printing = rotate_for_printing ? [90, 0, 0] : [0, 0, 0];
 
   translate([0, 0, die_height / 2 + support_height])
     rotate(point_down_if_printing) {
       difference() {
-        union() {
-          cuboid([face_edge, d4c_body_length, face_edge]);
-
-          translate([0, -d4c_body_length / 2, 0])
-            rotate([90, 90, 0])
-              prismoid([face_edge, face_edge], [0, 0], h=face_edge / 2);
-
-          mirror([0, 1, 0])
-            translate([0, -d4c_body_length / 2, 0])
-              rotate([90, 90, 0])
-                prismoid([face_edge, face_edge], [0, 0], h=face_edge / 2);
-        }
+        crystal(face_edge, d4c_body_length, end_height, see_supports);
 
         if (do_draw_text)
           draw_d4c_text(face_edge);
@@ -118,12 +107,11 @@ module draw_d4_crystal(face_edge, support_height, do_draw_text) {
     }
 
   if (support_height > 0) {
-    width = 1.22474 * face_edge;
-    height = 1.15455 * triangle_height(face_edge/2);
+    width = 1.225 * face_edge;
+    height = 1.85 * triangle_height(face_edge/2);
     rotate([0, 0, 45])
       render_supports(width, height, support_height, 4);
   }
-
 }
 
 module draw_d4c_text(height) {
@@ -145,12 +133,28 @@ module draw_d4c_text(height) {
 
 module draw_d6(face_edge, support_height, do_draw_text) {
 
-  y_rotation = atan(1/sqrt(2));
-  die_height = face_edge * sin(60);
-  z_translation = face_edge * sin(60) + support_height;
-  point_down_if_printing = rotate_for_printing ? [45, y_rotation, 0] : [0, 0, 0];
-    
-  translate([0, 0, die_height + support_height])
+  die_height = face_edge * sin(60);    
+  translate([0, 0, die_height + support_height]) {
+    if (see_supports) { // need to make the shape hollow
+      difference() {
+        draw_tipped_shape();
+        translate([0, 0, .0025])
+          draw_tipped_shape();
+      }
+    } else
+     draw_tipped_shape();
+  }
+
+  if (support_height > 0) {
+    width = sqrt(face_edge * face_edge *2 );
+    height = face_edge * 0.58;
+    rotate([0, 0, 60])
+      render_supports(width, height, support_height, 3);
+  }
+
+  module draw_tipped_shape() {
+    point_down_if_printing = rotate_for_printing ? [45, atan(1/sqrt(2)), 0] : [0, 0, 0];
+
     rotate(point_down_if_printing) {
       difference() {
         intersection() {
@@ -165,18 +169,12 @@ module draw_d6(face_edge, support_height, do_draw_text) {
           draw_d6_text(face_edge);
       }
     }
-
-  if (support_height > 0) {
-    width = sqrt(face_edge * face_edge *2 );
-    height = face_edge * 0.58;
-    rotate([0, 0, 60])
-      render_supports(width, height, support_height, 3);
   }
 }
 
 module draw_d6_text(height) {
   
-  height_multiplier = 0.65;
+  height_multiplier = 0.6;
   digits = ["1", "2", "3", "4", "5", "6"];
 
   rotate([0, 0, 180])
@@ -206,11 +204,27 @@ module draw_d6_text(height) {
 
 module draw_d8(face_edge, support_height, do_draw_text) {
 
-  z_translation = face_edge * 0.70715 + support_height;
-  point_down_if_printing = rotate_for_printing ? [-54.7355, 0, 0] : [35.2645, 0, 0];
   face_height = face_edge * 0.81654872074;
-  
-  translate ([0, 0, z_translation])
+  translate ([0, 0, face_edge * 0.70715 + support_height]) {
+    if (see_supports) { // need to make the shape hollow
+      difference() {
+        draw_tipped_shape();
+        translate([0, 0, .0025])
+          draw_tipped_shape();
+      }
+    } else
+     draw_tipped_shape();
+  }
+
+  if (support_height > 0) {
+    width = face_edge * 1.225;
+    height = face_edge * .7075;
+    rotate([0, 0, 45])
+      render_supports(width, height, support_height, 4);
+  }
+
+  module draw_tipped_shape() {
+    point_down_if_printing = rotate_for_printing ? [-54.7355, 0, 0] : [35.2645, 0, 0];
     rotate(point_down_if_printing) {
       difference() {
         intersection() {
@@ -226,12 +240,6 @@ module draw_d8(face_edge, support_height, do_draw_text) {
         draw_d8_text(face_height);
       }
     }
-
-  if (support_height > 0) {
-    width = face_edge * 1.225;
-    height = face_edge * .7075;
-    rotate([0, 0, 45])
-      render_supports(width, height, support_height, 4);
   }
 }
 
@@ -266,62 +274,73 @@ module draw_d8_text(height) {
 //------------------------------------------------------------------------------------
 module draw_d10(face_edge, support_height, is_percentile, do_draw_text) {
 
-  z_translation = face_edge + support_height;
-  point_down_if_printing = rotate_for_printing ? [312, 0, 0] : [222, 0, 0];
-
   digits = is_percentile ? ["40", "70", "80", "30", "20", "90", "00", "10", "60", "50"] :
                            ["0", "1", "2", "9", "8", "3", "4", "7", "6", "5"];
 
   underscores = is_percentile ? [] : ["", "", "", UND, "", "", "", "", UND, ""];
 
-  translate ([0, 0, z_translation])
+  translate ([0, 0, face_edge + support_height]) {
+    if (see_supports) { // need to make the shape hollow
+      difference() {
+        draw_tipped_shape();
+        translate([0, 0, .0025])
+          draw_tipped_shape();
+      }
+    } else
+     draw_tipped_shape();
+  }
+
+  if (support_height > 0) {
+    width = face_edge * 1.1;
+    height = face_edge * .8888888;
+    rotate([0, 0, 18])
+      render_supports(width, height, support_height, 5);
+  }
+
+  module draw_tipped_shape() {
+    point_down_if_printing = rotate_for_printing ? [312, 0, 0] : [222, 0, 0];
+
     rotate(point_down_if_printing) {
       difference() {
         deltohedron(face_edge);
         
         if (draw_text)
           rotate([48, 0, 0])
-            deltohedron_text(face_edge, d10_angle, 1, 0, 0, digits, underscores, is_percentile ? 0.32 : 0.4);
+            deltohedron_text(face_edge, d10_angle, 1, 0, 0, digits, underscores, is_percentile ? 0.30 : 0.4);
       }
-  }
-
-  if (support_height > 0) {
-    width = face_edge * 1.105;
-    height = face_edge * .888888;
-    rotate([0, 0, 18])
-      render_supports(width, height, support_height, 5);
+    }
   }
 }
 
 module deltohedron_text(height, angle, text_depth, text_push, text_offset, digits, underscores, height_multiplier) {
   
   has_underscores = len(underscores) > 0;
-  echo(height);
 
-  for (i = [0:4]) { 
-    rotate([0, 0, 72 * i])
-      rotate([angle, 0, 0]) {
-        index = i * 2 + text_offset;
- 
-        // Draw top half
-        translate([0, text_push - text_offset, 0.5 * height - text_depth])
-          extrude_text(digits[index + 1], height, height_multiplier);
+  rotate([0, 0, 72]) // make numbers right side up
+    for (i = [0:4]) { 
+      rotate([0, 0, 72 * i])
+        rotate([angle, 0, 0]) {
+          index = i * 2 + text_offset;
+  
+          // Draw top half
+          translate([0, text_push - text_offset, 0.5 * height - text_depth])
+            extrude_text(digits[index + 1], height, height_multiplier);
 
-        if (has_underscores)
-          translate([0, 2 * (text_push - 5 * font_scale / 100) / 3 - height/15, 0.5 * height - text_depth])
-            extrude_text(underscores[index + 1], height, height_multiplier);
+          if (has_underscores)
+            translate([0, 2 * (text_push - 5 * font_scale / 100) / 3 - height/20, 0.5 * height - text_depth])
+              extrude_text(underscores[index + 1], height, height_multiplier);
 
-        // Draw bottom half
-        translate([0, -text_push - (text_offset), -0.5 * height + text_depth])
-          rotate([0, 180, 180])
-            extrude_text(digits[index], height, height_multiplier);
+          // Draw bottom half
+          translate([0, -text_push - (text_offset), -0.5 * height + text_depth])
+            rotate([0, 180, 180])
+              extrude_text(digits[index], height, height_multiplier);
 
-        if (has_underscores)
-          translate([0, -2 * (text_push - 5 * font_scale / 100) / 3 + height/15, -0.5 * height + text_depth])
-            rotate([0, 180, 0])
-             extrude_text(underscores[index], height, height_multiplier);
-      }
-  }
+          if (has_underscores)
+            translate([0, -2 * (text_push - 5 * font_scale / 100) / 3 + height/15, -0.5 * height + text_depth])
+              rotate([0, 180, 0])
+              extrude_text(underscores[index], height, height_multiplier);
+        }
+    }
 }
 
 //------------------------------------------------------------------------------------
@@ -331,10 +350,28 @@ module deltohedron_text(height, angle, text_depth, text_push, text_offset, digit
 module draw_d12(face_edge, support_height, do_draw_text) {
   
   z_translation = face_edge * 0.89347 + support_height;
-  point_down_if_printing = rotate_for_printing ? [-37.3775, 0, 0] : [-127.3775, 0, 0];
   face_height = face_edge * 1.42;
 
-  translate ([0, 0, z_translation])
+  translate ([0, 0, z_translation]) {
+    if (see_supports) { // need to make the shape hollow
+      difference() {
+        draw_tipped_shape();
+        translate([0, 0, .0025])
+          draw_tipped_shape();
+      }
+    } else
+     draw_tipped_shape();
+  }
+
+  if (support_height > 0) {
+    width = face_edge * 1.03;
+    height = face_edge * .226;
+    rotate([0, 0, 90])
+      render_supports(width, height, support_height, 3, false);
+  }
+
+  module draw_tipped_shape() {
+    point_down_if_printing = rotate_for_printing ? [-37.3775, 0, 0] : [-127.3775, 0, 0];
     rotate(point_down_if_printing) {
       difference() {
         intersection() {
@@ -343,20 +380,13 @@ module draw_d12(face_edge, support_height, do_draw_text) {
           if (cut_corners)
             rotate([35, 10, -18])
               icosahedron(face_height * 1.218);
-      }
+        }
       
-      if (do_draw_text)
-        draw_d12_text(face_height, 116.565);
+        if (do_draw_text)
+          draw_d12_text(face_height, 116.565);
+      }
     }
   }
-
-  if (support_height > 0) {
-    width = face_edge * 1.03;
-    height = face_edge * .226;
-    rotate([0, 0, 90])
-      render_supports(width, height, support_height, 3, true);
-  }
-
 }
 
 module draw_d12_text(height, slope, height_multiplier = 0.32) {
@@ -385,7 +415,25 @@ module draw_d20(face_edge, support_height, do_draw_text) {
   z_translation = face_edge * 0.9878 + support_height;
   face_height = face_edge * 1.56995960338;
   
-  translate ([0, 0, z_translation]) 
+  translate ([0, 0, z_translation]) {
+    if (see_supports) { // need to make the shape hollow
+      difference() {
+        draw_tipped_shape();
+        translate([0, 0, .0025])
+          draw_tipped_shape();
+      }
+    } else
+     draw_tipped_shape();
+  } 
+
+  if (support_height > 0) {
+    width = face_edge * 1.53;
+    height = face_edge * .5465;
+    rotate([0, 0, 90])
+      render_supports(width, height, support_height, 5);
+  }
+
+  module draw_tipped_shape() {
     rotate([35.264, 13.285, 18]) {
       difference() {
         intersection() {
@@ -400,12 +448,6 @@ module draw_d20(face_edge, support_height, do_draw_text) {
           draw_d20_text(face_height);
       }
     }
-
-  if (support_height > 0) {
-    width = face_edge * 1.53;
-    height = face_edge * .5465;
-    rotate([0, 0, 90])
-      render_supports(width, height, support_height, 5);
   }
 }
 
@@ -456,11 +498,19 @@ module draw_d20_text_face(height, digit, underscore) {
   
   rotate([0, 0, 39])
     translate([0, offset, 0.5 * height - 1])
-      if (d20_svg_replace_digit > 0 && d20_svg_file != "" && str(d20_svg_replace_digit) == digit) {
-        svg_scale_multiplier = .45 / 10000;
-        render_svg(d20_svg_file, d20_svg_rotation, svg_scale_multiplier * d20_svg_scale * height, d20_svg_offset);
-      } else
-        extrude_text(digit, height, height_multiplier);    
+      if (d20_replace_digit > 0 && str(d20_replace_digit) == digit) {
+        if (d20_text != "") {
+          rotate([0, 0, d20_face_rotation])
+            extrude_text(d20_text, height, height_multiplier * d20_face_scale / 100);
+        } else if (d20_svg_file != "") {
+          svg_scale_multiplier = .45 / 10000;
+          render_svg(d20_svg_file, d20_face_rotation, svg_scale_multiplier * d20_face_scale * height, d20_face_offset);
+        } else {
+          extrude_text(digit, height, height_multiplier);
+        }
+      } else {
+        extrude_text(digit, height, height_multiplier);
+      }
       
   rotate([0, 0, 39])
     translate([0, -(5 * font_scale / 100 / 2.5), 0.5 * height - 1])

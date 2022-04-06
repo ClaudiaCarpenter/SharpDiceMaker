@@ -4,7 +4,7 @@ PRESETS="./SharpDiceMaker.json"
 gen_die() {
   echo
   echo "$1p.stl..."
-  $OPENSCAD -o ./dice_plain/$1p.stl -D "which_die=\"$1\"" -p $PRESETS  -P "sutro plain" SharpDiceMaker.scad
+  $OPENSCAD -q -o ./dice_plain/$1p.stl -D "which_die=\"$1\"" -p $PRESETS  -P "dumbledor" SharpDiceMaker.scad
 }
 
 rm -rf ./dice_plain

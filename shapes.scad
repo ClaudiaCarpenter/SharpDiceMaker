@@ -61,7 +61,18 @@ module icosahedron(height) {
     }
 }
 
-module tetrahedron(height) {
+module tetrahedron(height, makeHollow = false) {
+
+  if (makeHollow)
+    difference() {
+      draw_shape();
+      translate([0, 0, -.0025])
+        draw_shape();
+    }
+  else
+    draw_shape();
+
+  module draw_shape() {
     scale([height, height, height]) {
         polyhedron(
             points = [
@@ -78,7 +89,34 @@ module tetrahedron(height) {
             ]
         );
     }
+  }
 }
+
+module crystal(face_edge, body_length, end_height, makeHollow = false) {
+
+  if (!makeHollow) 
+    cuboid([face_edge, body_length, face_edge]);
+
+  translate([0, -body_length / 2, 0])
+    rotate([90, 90, 0]) {
+      if (makeHollow) {
+        difference() {
+        prismoid([face_edge, face_edge], [0, 0], h=end_height);
+        translate([0, 0, -.0025])
+          prismoid([face_edge, face_edge], [0, 0], h=end_height);
+        }
+      } else
+        prismoid([face_edge, face_edge], [0, 0], h=end_height);
+    }
+
+  if (!makeHollow) 
+    mirror([0, 1, 0])
+      translate([0, -body_length / 2, 0])
+        rotate([90, 90, 0])
+          prismoid([face_edge, face_edge], [0, 0], h=end_height);
+
+}
+
 
 //------------------------------------------------------------------------------------
 //                                  BASES FOR MOLDING
@@ -105,7 +143,7 @@ module render_supports(length, height, support_offset, num = 3, add_tall_support
         render_support(length, height+.1, 0.2, support_offset);
 
   // step-wise, angled taper for added stability
-  color(support_color, .5) 
+  color(support_color, 0.25) 
     for (i = [0 : num])
       rotate([0, 0, i * rotate_by]) {
         for (j = [0 : 5])
@@ -115,7 +153,7 @@ module render_supports(length, height, support_offset, num = 3, add_tall_support
       
   // support raft that sits on the bed plus extension for the D12
   if (add_tall_supports)
-    color(support_color, 0.5) 
+    color(support_color, 0.75) 
       for (i = [0 : num])
         rotate([0, 0, i * rotate_by]) 
           render_base(length, height, support_offset, support_offset, add_tall_supports);
@@ -128,14 +166,14 @@ module render_support(length, height, depth, support_offset = 0) {
   
   triangle_points = [
       [0, 0],                               // lower left
-      [0, support_offset],                  // upper left
+      [0, support_offset + .1],                  // upper left
       [midpoint, height + support_offset],  // upper right 
       [midpoint, 0]                         // lower right
   ];
 
   clipping_points = [
-      [clip_by, 0],                                   // lower left
-      [clip_by, height + support_offset],             // upper left
+      [clip_by, 0],                         // lower left
+      [clip_by, height + support_offset],   // upper left
       [midpoint, height + support_offset],  // upper right 
       [midpoint, 0]                         // lower right
   ];
@@ -161,7 +199,7 @@ module render_base(length, height, width, support_offset = 0, add_tall_supports 
       [base_length, 0]
   ];
 
-  color(support_color, .5) 
+  color(support_color) 
     rotate([90, 0, 0]) 
       linear_extrude(height = size, center = true) 
         polygon(points = points);
