@@ -26,6 +26,33 @@
             "see_supports": "false",
             "supports_height": "3",
             "underscore_glyph": "_"
+        },
+        "plain": {
+            "cut_corners": "false",
+            "d10_angle": "120",
+            "d10_face_edge": "15",
+            "d12_face_edge": "13",
+            "d20_face_edge": "13",
+            "d20_face_offset": "0",
+            "d20_face_rotation": "0",
+            "d20_face_scale": "80",
+            "d20_replace_digit": "1",
+            "d20_svg_file": "svg\/scull_crossbones.svg",
+            "d20_text": "",
+            "d4_face_edge": "21",
+            "d4c_face_edge": "12",
+            "d6_face_edge": "16",
+            "d8_face_edge": "18",
+            "do_projection": "false",
+            "draw_text": "false",
+            "extrude_depth": "2",
+            "font": "Dumbledor 1:style=Regular",
+            "font_scale": "110",
+            "font_two_digit_spacing": "100",
+            "rotate_for_printing": "true",
+            "see_supports": "false",
+            "supports_height": "3",
+            "underscore_glyph": "_"
         }
     },
     "fileFormatVersion": "1"
