@@ -38,7 +38,7 @@ module octahedron(height) {
             // Make a cube, rotate it 109.47122 degrees around the X axis,
             // then 120 * i around the Z axis
             rotate([109.47122, 0, 120 * i])
-            cube([2 * height, 2 * height, height], center = true); 
+              cube([2 * height, 2 * height, height], center = true); 
         }
     }
 }

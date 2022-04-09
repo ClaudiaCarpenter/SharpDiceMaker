@@ -1,67 +1,5 @@
 //------------------------------------------------------------------------------------
-//                                       D4
-//------------------------------------------------------------------------------------
-
-module draw_d4(face_edge, support_height, do_draw_text) {
-  die_height = triangle_height(face_edge);
-  z_translation = 1.4141035 * die_height / 2 + support_height;
-  point_down_if_printing = rotate_for_printing ? [0, 180, 60] : [0, 0, 210];
-  
-  translate([0, 0, z_translation])
-    rotate(point_down_if_printing)
-      difference() {
-        intersection() {
-          tetrahedron(face_edge, see_supports);
-          
-          if (cut_corners)
-            rotate([0, 180, 0])
-              tetrahedron(face_edge * 3 * 0.85);
-        }
-        
-        if (do_draw_text)
-          draw_d4_text(face_edge);
-      }
-
-  if (support_height > 0) {
-    width = face_edge;
-    height = triangle_height(face_edge) * .95;
-    render_supports(width, height, support_height, 3);
-  }
-}
-
-module draw_d4_text(height) {
-  digits = ["1", "2", "3", 
-            "4", "3", "2", 
-            "4", "2", "1", 
-            "4", "1", "3"];
-
-  height_multiplier = 0.24;
-  text_depth = 0.6;
-  text_push = 0.26;
-  
-  rotate([180, 0, 0])
-    translate([0, 0, 0.2 * height - text_depth])
-      for (i = [0:2]) { 
-        rotate([0, 0, 120 * i])
-          translate([text_push * height, 0, 0])
-            rotate([0, 0, -90])
-              extrude_text(digits[i], height, height_multiplier);
-      }
-
-      for (j = [0:2]) { 
-        rotate([0, -70.5288, j * 120])
-          translate([0, 0, 0.2 * height - text_depth])
-            for (i = [0:2]) {
-              rotate([0, 0, 120 * i])
-                translate([text_push * height, 0, 0])
-                  rotate([0, 0, -90])
-                    extrude_text(digits[(j + 1) * 3 + i], height, height_multiplier);
-            }
-      }
-}
-
-//------------------------------------------------------------------------------------
-//                                      D4C
+//                                      d4
 //------------------------------------------------------------------------------------
 
 include <BOSL2/std.scad>
@@ -69,19 +7,19 @@ include <BOSL2/shapes.scad>
 include <BOSL2/polyhedra.scad>
 
 module draw_d4_crystal(face_edge, support_height, do_draw_text) {
-  d4c_body_length = 1.25 * face_edge;
+  d4_body_length = 1.25 * face_edge;
   end_height = face_edge / 1.25;
-  die_height = d4c_body_length + end_height * 2;
+  die_height = d4_body_length + end_height * 2;
   z_translation = die_height / 2 + support_height;
   point_down_if_printing = rotate_for_printing ? [90, 0, 0] : [0, 0, 0];
 
   translate([0, 0, die_height / 2 + support_height])
     rotate(point_down_if_printing) {
       difference() {
-        crystal(face_edge, d4c_body_length, end_height, see_supports);
+        crystal(face_edge, d4_body_length, end_height, see_supports);
 
         if (do_draw_text)
-          draw_d4c_text(face_edge);
+          draw_d4_text(face_edge);
       }
     }
 
@@ -93,10 +31,11 @@ module draw_d4_crystal(face_edge, support_height, do_draw_text) {
   }
 }
 
-module draw_d4c_text(height) {
+module draw_d4_text(height) {
   height_multiplier = 0.75;
   digits = ["3", "4", "2", "1"];
-  y_offset = -2 * font_scale / 150;
+  echo(-height_multiplier * font_scale / 100);
+  y_offset = -0.5 * height_multiplier * font_scale / 100;
   for (i = [0:3]) { 
     rotate([0, 90*i, 0])
       rotate([90, 90, 90]) {
@@ -155,7 +94,7 @@ module draw_d6(face_edge, support_height, do_draw_text) {
 module draw_d6_text(height) {
   
   height_multiplier = 0.6;
-  y_offset = -2.5 * font_scale / 150;
+  y_offset = -height_multiplier * font_scale / 100;
   digits = ["1", "2", "3", "4", "5", "6"];
 
   rotate([0, 0, 180])
@@ -226,10 +165,10 @@ module draw_d8(face_edge, support_height, do_draw_text) {
 
 module draw_d8_text(height) {
   text_depth = extrude_depth;
-  height_multiplier = 0.5;
+  height_multiplier = 0.45;
   digits = ["4", "2", "8", "3", "6", "1", "7", "5"];
   rotate_face = 109.4712;
-  text_offset = -height * 0.0681;
+  y_offset = 0;
 
   draw_pair("4", "5");
 
@@ -247,10 +186,10 @@ module draw_d8_text(height) {
 
   module draw_pair(first, second) {
     rotate([0, 0, 180])
-      translate([0, text_offset, 0.5 * height - text_depth])
+      translate([0, y_offset, 0.5 * height - text_depth])
         extrude_text(first, height, height_multiplier);
 
-    translate([0, text_offset, -0.5 * height + text_depth])
+    translate([0, y_offset, -0.5 * height + text_depth])
       rotate([0, 180, 0])
         extrude_text(second, height, height_multiplier);
   }
@@ -292,7 +231,7 @@ module draw_d10(face_edge, support_height, is_percentile, do_draw_text) {
         
         if (draw_text)
           rotate([48, 0, 0])
-            deltohedron_text(face_edge, d10_angle, 1, -0.8*(font_scale / 100.0), 0, digits, is_percentile ? 0.34 : 0.4);
+            deltohedron_text(face_edge, d10_angle, 1, -0.8*(font_scale / 100.0), 0, digits, is_percentile ? 0.3 : 0.4);
       }
     }
   }
@@ -306,17 +245,15 @@ module deltohedron_text(height, angle, text_depth, text_push, text_offset, digit
         rotate([angle, 0, 0]) {
           index = i * 2 + text_offset;
 
-          // Vertically aligning the text for the 3 cases (d10, d% and d12) is fiddly
-          adjusted_offset = 0.10 * height * height_multiplier * font_scale / 100;
-          from_top = text_push - text_offset - adjusted_offset;
+          y_offset = -height_multiplier * font_scale/100;
           inset_depth = 0.5 * height - text_depth;
 
           // Draw top half
-          translate([0, from_top, inset_depth])
+          translate([0, y_offset, inset_depth])
             extrude_text(digits[index + 1], height, height_multiplier);
 
           // Draw bottom half
-          translate([0, -from_top, -inset_depth])
+          translate([0, -y_offset, -inset_depth])
             rotate([0, 180, 180])
               extrude_text(digits[index], height, height_multiplier);
         }
@@ -465,7 +402,7 @@ module draw_d20_text(height) {
       
     module draw_numbers(height, digit) {
       height_multiplier = .22;
-      y_offset = -1 * font_scale / 150;
+      y_offset = -height_multiplier * font_scale/100;
 
       rotate([0, 0, 39])
         translate([0, y_offset, 0.5 * height - 1])
@@ -477,8 +414,9 @@ module draw_d20_text(height) {
                   extrude_text(d20_text, height, height_multiplier * d20_face_scale / 100, icon_font);
 
             } else if (d20_svg_file != "") {
+              echo(d20_face_offset * height_multiplier * d20_face_scale / 100, d20_face_offset, height_multiplier, d20_face_scale / 100);
               svg_scale_multiplier = .45 / 10000;
-              render_svg(d20_svg_file, d20_face_rotation, svg_scale_multiplier * d20_face_scale * height, d20_face_offset);
+              render_svg(d20_svg_file, d20_face_rotation, svg_scale_multiplier * d20_face_scale * height, 4 * (d20_face_offset + height_multiplier * d20_face_scale / 100));
 
             } else {
               extrude_text(digit, height, height_multiplier);
@@ -497,25 +435,33 @@ module draw_d20_text(height) {
  //------------------------------------------------------------------------------------
 //                               Text / Image Utils
 //------------------------------------------------------------------------------------
+show_bounding_box = false;
 
 module render_svg(svg_file, svg_rotation, svg_scale, svg_offset) {
-  translate([0, svg_offset, -extrude_depth + 1])
-    rotate([0, 0, svg_rotation])
-      scale([svg_scale, svg_scale, 1])
-        linear_extrude(height = extrude_depth + 1)
-          import(svg_file, center = true);
-}
-
-debug_text = false;
-module extrude_text(some_text, height, multiplier, potential_font ="") {
-  if (debug_text) {
+  if (show_bounding_box) {
     extrude_it();
     %bounding_box() extrude_it();
   } else
       extrude_it();
 
   module extrude_it() {
-    translate([0, 0, -extrude_depth + 1])
+    translate([0, svg_offset, -extrude_depth + 1])
+      rotate([0, 0, svg_rotation])
+        scale([svg_scale, svg_scale, 1])
+          linear_extrude(height = extrude_depth + 1)
+            import(svg_file, center = true);
+  }
+}
+
+module extrude_text(some_text, height, multiplier, potential_font ="") {
+  if (show_bounding_box) {
+    extrude_it();
+    %bounding_box() extrude_it();
+  } else
+      extrude_it();
+
+  module extrude_it() {
+    translate([0, vertical_offset*multiplier, -extrude_depth + 1])
       linear_extrude(height = extrude_depth + 1)
         text(some_text, size = height * multiplier * font_scale / 100, valign="center", halign="center", font=(len(potential_font) > 0 ? potential_font : font));
   }

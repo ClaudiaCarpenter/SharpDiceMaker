@@ -13,8 +13,8 @@ icon_font = "";
 
 // ^ font percentage sizing scale
 font_scale = 100;
-// ^ font spacing for numbers greater than 9
-font_two_digit_spacing = 100;
+// ^ 
+vertical_offset = 0;
 // ^ true to draw the numbers, false to make blank faces
 draw_text = true;
 // ^ depth of text extrusion in mm
