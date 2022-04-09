@@ -1,3 +1,10 @@
 /dice
 
 playground.scad
+
+*.chitubox
+*.old
+*.tmp
+
+Poly*
+dice5.1.scad

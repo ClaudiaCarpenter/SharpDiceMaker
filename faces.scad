@@ -1,25 +1,4 @@
 //------------------------------------------------------------------------------------
-//                                     Utils
-//------------------------------------------------------------------------------------
-
-function calc_spacing(digits) = len(digits) > 1 ? font_two_digit_spacing / 100 : 1;
-
-module extrude_text(some_text, height, multiplier) {
-  translate([len(some_text) > 1 ? -(100 - font_two_digit_spacing) / 100: 0, 0, -extrude_depth + 1])
-    linear_extrude(height = extrude_depth + 1)
-      text(some_text, size = height * multiplier * font_scale / 100, spacing = calc_spacing(some_text), valign="center", halign="center", font=font);
-}
-
-
-module render_svg(svg_file, svg_rotation, svg_scale, svg_offset) {
-  translate([0, svg_offset, -extrude_depth + 1])
-    rotate([0, 0, svg_rotation])
-      scale([svg_scale, svg_scale, 1])
-        linear_extrude(height = extrude_depth + 1)
-          import(svg_file, center = true);
-}
-
-//------------------------------------------------------------------------------------
 //                                       D4
 //------------------------------------------------------------------------------------
 
@@ -117,10 +96,11 @@ module draw_d4_crystal(face_edge, support_height, do_draw_text) {
 module draw_d4c_text(height) {
   height_multiplier = 0.75;
   digits = ["3", "4", "2", "1"];
+  y_offset = -2 * font_scale / 150;
   for (i = [0:3]) { 
     rotate([0, 90*i, 0])
       rotate([90, 90, 90]) {
-        translate([0, 0, 0.5 * height - 1])
+        translate([0, y_offset, 0.5 * height - 1])
           extrude_text(digits[i], height, height_multiplier);
       }
   }
@@ -175,22 +155,23 @@ module draw_d6(face_edge, support_height, do_draw_text) {
 module draw_d6_text(height) {
   
   height_multiplier = 0.6;
+  y_offset = -2.5 * font_scale / 150;
   digits = ["1", "2", "3", "4", "5", "6"];
 
   rotate([0, 0, 180])
-    translate([0, 0, 0.5 * height - 1])
+    translate([0, y_offset, 0.5 * height - 1])
       extrude_text(digits[0], height, height_multiplier);
 
-  translate([0, 0, -0.5 * height + 1])
+  translate([0, -y_offset, -0.5 * height + 1])
     rotate([0, 180, 180])
       extrude_text(digits[5], height, height_multiplier);
 
   for (i = [0:1]) { 
     rotate([90, 0, 90 * i]) {
-      translate([0, 0, 0.5 * height - 1])
+      translate([0, y_offset, 0.5 * height - 1])
         extrude_text(digits[i * 2 + 1], height, height_multiplier);
 
-      translate([0, 0, -0.5 * height + 1])
+      translate([0, -y_offset, -0.5 * height + 1])
         rotate([0, 180, 180])
           extrude_text(digits[4 - i * 2], height, height_multiplier);
     }
@@ -244,29 +225,36 @@ module draw_d8(face_edge, support_height, do_draw_text) {
 }
 
 module draw_d8_text(height) {
-  text_depth = 0.6;
+  text_depth = extrude_depth;
   height_multiplier = 0.5;
   digits = ["4", "2", "8", "3", "6", "1", "7", "5"];
-  text_offset = height * 0.0681;
+  rotate_face = 109.4712;
+  text_offset = -height * 0.0681;
 
-  rotate([0, 0, 180])
-    translate([0, text_offset, 0.5 * height - text_depth])
-      extrude_text(digits[0], height, height_multiplier);
+  draw_pair("4", "5");
 
-  translate([0, text_offset, -0.5 * height + text_depth])
-    rotate([0, 180, 180])
-      extrude_text(digits[7], height, height_multiplier);
+  rotate([rotate_face, 0, 120])
+    rotate([0, 0, 60])
+      draw_pair("3", "6");
 
-  for (i = [0:2]) { 
-    rotate([109.47122, 0, 120 * i]) {
+  rotate([rotate_face, 0, 0])
+    rotate([0, 0, 180])
+      draw_pair("2", "7");
+
+  rotate([rotate_face, 0, 240])
+    rotate([0, 0, -60])
+      draw_pair("1", "8");
+
+  module draw_pair(first, second) {
+    rotate([0, 0, 180])
       translate([0, text_offset, 0.5 * height - text_depth])
-        extrude_text(digits[i*2 + 1], height, height_multiplier);
+        extrude_text(first, height, height_multiplier);
 
-      translate([0, 0, -0.5 * height + text_depth])
-        rotate([0, 180, 180])
-          extrude_text(digits[6 - i * 2], height, height_multiplier);
-    }
+    translate([0, text_offset, -0.5 * height + text_depth])
+      rotate([0, 180, 0])
+        extrude_text(second, height, height_multiplier);
   }
+
 }
 
 //------------------------------------------------------------------------------------
@@ -275,9 +263,7 @@ module draw_d8_text(height) {
 module draw_d10(face_edge, support_height, is_percentile, do_draw_text) {
 
   digits = is_percentile ? ["40", "70", "80", "30", "20", "90", "00", "10", "60", "50"] :
-                           ["0", "1", "2", "9", "8", "3", "4", "7", "6", "5"];
-
-  underscores = is_percentile ? [] : ["", "", "", UND, "", "", "", "", UND, ""];
+                           ["0", "1", "2", "9.", "8", "3", "4", "7", "6.", "5"];
 
   translate ([0, 0, face_edge + support_height]) {
     if (see_supports) { // need to make the shape hollow
@@ -306,39 +292,33 @@ module draw_d10(face_edge, support_height, is_percentile, do_draw_text) {
         
         if (draw_text)
           rotate([48, 0, 0])
-            deltohedron_text(face_edge, d10_angle, 1, 0, 0, digits, underscores, is_percentile ? 0.30 : 0.4);
+            deltohedron_text(face_edge, d10_angle, 1, -0.8*(font_scale / 100.0), 0, digits, is_percentile ? 0.34 : 0.4);
       }
     }
   }
 }
 
-module deltohedron_text(height, angle, text_depth, text_push, text_offset, digits, underscores, height_multiplier) {
+module deltohedron_text(height, angle, text_depth, text_push, text_offset, digits, height_multiplier) {
   
-  has_underscores = len(underscores) > 0;
-
-  rotate([0, 0, 72]) // make numbers right side up
+  rotate([0, 0, 72]) // makes numbers right side up
     for (i = [0:4]) { 
       rotate([0, 0, 72 * i])
         rotate([angle, 0, 0]) {
           index = i * 2 + text_offset;
-  
+
+          // Vertically aligning the text for the 3 cases (d10, d% and d12) is fiddly
+          adjusted_offset = 0.10 * height * height_multiplier * font_scale / 100;
+          from_top = text_push - text_offset - adjusted_offset;
+          inset_depth = 0.5 * height - text_depth;
+
           // Draw top half
-          translate([0, text_push - text_offset, 0.5 * height - text_depth])
+          translate([0, from_top, inset_depth])
             extrude_text(digits[index + 1], height, height_multiplier);
 
-          if (has_underscores)
-            translate([0, 2 * (text_push - 5 * font_scale / 100) / 3 - height/20, 0.5 * height - text_depth])
-              extrude_text(underscores[index + 1], height, height_multiplier);
-
           // Draw bottom half
-          translate([0, -text_push - (text_offset), -0.5 * height + text_depth])
+          translate([0, -from_top, -inset_depth])
             rotate([0, 180, 180])
               extrude_text(digits[index], height, height_multiplier);
-
-          if (has_underscores)
-            translate([0, -2 * (text_push - 5 * font_scale / 100) / 3 + height/15, -0.5 * height + text_depth])
-              rotate([0, 180, 0])
-              extrude_text(underscores[index], height, height_multiplier);
         }
     }
 }
@@ -351,6 +331,7 @@ module draw_d12(face_edge, support_height, do_draw_text) {
   
   z_translation = face_edge * 0.89347 + support_height;
   face_height = face_edge * 1.42;
+  height_multiplier = .32; //face_edge * .025 / font_scale / 100.0;
 
   translate ([0, 0, z_translation]) {
     if (see_supports) { // need to make the shape hollow
@@ -383,27 +364,26 @@ module draw_d12(face_edge, support_height, do_draw_text) {
         }
       
         if (do_draw_text)
-          draw_d12_text(face_height, 116.565);
+          draw_d12_text(face_height, 116.565, height_multiplier);
       }
     }
   }
 }
 
-module draw_d12_text(height, slope, height_multiplier = 0.32) {
+module draw_d12_text(height, slope, height_multiplier) {
   
-  text_depth = 0.6;
-  digits = ["2", "11", "4", "9", "6", "7", "5", "8", "3", "10"];
-  underscores = ["", "", "", UND, UND, "", "", "", "", "", "", ""];
-  
+  text_depth = extrude_depth;
+  digits = ["2", "11", "4", "9.", "6.", "7", "5", "8", "3", "10"];
+
   rotate([0, 0, 180])
-    translate([0, 0, 0.5 * height - text_depth])
+    translate([0, -1, 0.5 * height - text_depth])
       extrude_text("12", height, height_multiplier);
 
-  translate([0, 0, -0.5 * height + text_depth])
+  translate([0, -1, -0.5 * height + text_depth])
     rotate([0, 180, 0])
       extrude_text("1", height, height_multiplier);
   
-  deltohedron_text(height, slope, 0.6, 0, 0, digits, underscores, height_multiplier);
+  deltohedron_text(height, slope, 0.6, 0, height/80, digits, height_multiplier);
 }
 
 //------------------------------------------------------------------------------------
@@ -453,66 +433,123 @@ module draw_d20(face_edge, support_height, do_draw_text) {
 
 module draw_d20_text(height) {
 
-    rotate([70.5288, 0, 60])
-      draw_d20_text_set(height, 0);
+  rotate([70.5288, 0, 60])
+    draw_face(height, 0);
 
-    rotate([0, 0, 60 + w])
-      draw_d20_text_set(height, 4);
+  rotate([0, 0, 60 + w])
+    draw_face(height, 4);
 
-    for (i = [1:3]) { 
-      rotate([0, 0, i * 120])
-        rotate([109.471, 0, 0])
-          rotate([0, 0, w])
-            draw_d20_text_set(height, 4 + i * 4);
-    }
-}
+  for (i = [1:3]) { 
+    rotate([0, 0, i * 120])
+      rotate([109.471, 0, 0])
+        rotate([0, 0, w])
+          draw_face(height, 4 + i * 4);
+  }
 
-module draw_d20_text_set(height, j) {
-  
-   digits =      ["18",  "1",  "6", "12", 
-                 "20",  "7", "10", "17", 
-                 "9",   "5", "14",  "2", 
-                 "3",  "13", "11", "16", 
-                 "15", "19",  "4",  "8"];
-  
-  underscores = ["", "", UND, "", 
-                 "", "", "", "",
-                UND, "", "", "",
-                "", "", "", "",
-                "", "", "", ""];
-
-  // Draw index, where index in [0, 4, 8, 12, 16] => "18", "20", "9", "3", "15"
-  rotate([0, 0, 180])
-    draw_d20_text_face(height, digits[j], underscores[j]);
-  
-  // Draw index+1, index+2, index+3
-  for (i = [0:2])
-    rotate([109.47122, 0, 120 * i])
-     draw_d20_text_face(height, digits[i + j + 1], underscores[i + j + 1]);
-}
-
-module draw_d20_text_face(height, digit, underscore) {
-
-  height_multiplier = .21;
-  offset = len(underscore) > 0 ? (5 * font_scale / 100 / 6) : 0;
-  
-  rotate([0, 0, 39])
-    translate([0, offset, 0.5 * height - 1])
-      if (d20_replace_digit > 0 && str(d20_replace_digit) == digit) {
-        if (d20_text != "") {
-          rotate([0, 0, d20_face_rotation])
-            extrude_text(d20_text, height, height_multiplier * d20_face_scale / 100);
-        } else if (d20_svg_file != "") {
-          svg_scale_multiplier = .45 / 10000;
-          render_svg(d20_svg_file, d20_face_rotation, svg_scale_multiplier * d20_face_scale * height, d20_face_offset);
-        } else {
-          extrude_text(digit, height, height_multiplier);
-        }
-      } else {
-        extrude_text(digit, height, height_multiplier);
-      }
+  module draw_face(height, j) {
+    // Order is critical 
+    digits =      ["18",  "1",  "6.", "12", 
+                  "20",  "7", "10", "17", 
+                  "9.",   "5", "14",  "2", 
+                  "3",  "13", "11", "16", 
+                  "15", "19",  "4",  "8"];
+    
+    // Draw index, where index in [0, 4, 8, 12, 16] => "18", "20", "9", "3", "15"
+    rotate([0, 0, 180])
+      draw_numbers(height, digits[j]);
+    
+    // Draw index+1, index+2, index+3
+    for (i = [0:2])
+      rotate([109.47122, 0, 120 * i])
+        draw_numbers(height, digits[i + j + 1]);
       
-  rotate([0, 0, 39])
-    translate([0, -(5 * font_scale / 100 / 2.5), 0.5 * height - 1])
-      extrude_text(underscore, height, height_multiplier);      
+    module draw_numbers(height, digit) {
+      height_multiplier = .22;
+      y_offset = -1 * font_scale / 150;
+
+      rotate([0, 0, 39])
+        translate([0, y_offset, 0.5 * height - 1])
+          if (d20_replace_digit > 0 && str(d20_replace_digit) == digit) {
+
+            if (d20_text != "") {
+              rotate([0, 0, d20_face_rotation])
+                translate([0, -d20_face_offset])
+                  extrude_text(d20_text, height, height_multiplier * d20_face_scale / 100, icon_font);
+
+            } else if (d20_svg_file != "") {
+              svg_scale_multiplier = .45 / 10000;
+              render_svg(d20_svg_file, d20_face_rotation, svg_scale_multiplier * d20_face_scale * height, d20_face_offset);
+
+            } else {
+              extrude_text(digit, height, height_multiplier);
+            }
+            
+          } else {
+            extrude_text(digit, height, height_multiplier);
+          }
+    }
+  }
 }
+
+
+
+
+ //------------------------------------------------------------------------------------
+//                               Text / Image Utils
+//------------------------------------------------------------------------------------
+
+module render_svg(svg_file, svg_rotation, svg_scale, svg_offset) {
+  translate([0, svg_offset, -extrude_depth + 1])
+    rotate([0, 0, svg_rotation])
+      scale([svg_scale, svg_scale, 1])
+        linear_extrude(height = extrude_depth + 1)
+          import(svg_file, center = true);
+}
+
+debug_text = false;
+module extrude_text(some_text, height, multiplier, potential_font ="") {
+  if (debug_text) {
+    extrude_it();
+    %bounding_box() extrude_it();
+  } else
+      extrude_it();
+
+  module extrude_it() {
+    translate([0, 0, -extrude_depth + 1])
+      linear_extrude(height = extrude_depth + 1)
+        text(some_text, size = height * multiplier * font_scale / 100, valign="center", halign="center", font=(len(potential_font) > 0 ? potential_font : font));
+  }
+}
+
+module bounding_box() { 
+
+    // a 3D approx. of the children projection on X axis 
+    module xProjection() 
+        translate([0,1/2,-1/2]) 
+            linear_extrude(1) 
+                hull() 
+                    projection() 
+                        rotate([90,0,0]) 
+                            linear_extrude(1) 
+                                projection() children(); 
+  
+    // a bounding box with an offset of 1 in all axis
+    module bbx()  
+        minkowski() { 
+            xProjection() children(); // x axis
+            rotate(-90)               // y axis
+                xProjection() rotate(90) children(); 
+            rotate([0,-90,0])         // z axis
+                xProjection() rotate([0,90,0]) children(); 
+        } 
+    
+    // offset children() (a cube) by -1 in all axis
+    module shrink()
+      intersection() {
+        translate([ 1, 1, 1]) children();
+        translate([-1,-1,-1]) children();
+      }
+
+   shrink() bbx() children(); 
+}
+

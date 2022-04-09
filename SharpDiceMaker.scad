@@ -6,8 +6,11 @@
 
 // ^ trims sharp vertices, but not the edges
 cut_corners = false;
-// ^ use Help > Font List, click to select a font and then click Copy to Clipboard
+// ^ use Help > Font List > click > Copy to Clipboard
 font = "Lato:style=Medium";
+// ^ whenever you're replacing a number with an icon
+icon_font = "";
+
 // ^ font percentage sizing scale
 font_scale = 100;
 // ^ font spacing for numbers greater than 9
@@ -15,9 +18,7 @@ font_two_digit_spacing = 100;
 // ^ true to draw the numbers, false to make blank faces
 draw_text = true;
 // ^ depth of text extrusion in mm
-extrude_depth = 2;
-// ^ character to draw below 6 under 9 - needs to be bottom aligned
-underscore_glyph = "_";
+extrude_depth = 1;
 
 // Polyhedral dice sizing is currently rather haphazard. People often reference
 // the Chessex set, but even those are arbitrary. The sizes below just come from a
@@ -67,16 +68,13 @@ d20_face_rotation = 0;
 d20_face_scale = 100;
 
 // ^ for tweaking the placement, play with this value
-d20_face_offset = 0;
+d20_face_offset = 0.0; // [-10.0:0.1:10.0]
 
 /* [Wall Supports] */
 supports_height = 3; // [0:10]
 // ^ height in mm for wall supports (0 for none)
 
 /* [Hidden] */
-
-// shorten user variable to align in arrays
-UND = underscore_glyph;
 
 // true to hollow out the die and cut in half
 see_supports = false;
@@ -92,6 +90,9 @@ d10_angle = 120; // original: 132
 
 include <shapes.scad>
 include <faces.scad>
+
+use <fonts/numbers/Dungeon.ttf>
+use <fonts/icons/Evilz.ttf>
 
 module drawWhich(which="d4") {
   intersection() {
