@@ -14,7 +14,7 @@ icon_font = "";
 // ^ font percentage sizing scale
 font_scale = 100;
 // ^ font spacing for numbers greater than 9
-vertical_offset = 0;
+vertical_offset = 0; // [-5.0:0.1:5.0]
 // ^ true to draw the numbers, false to make blank faces
 draw_text = true;
 // ^ depth of text extrusion in mm
@@ -50,13 +50,13 @@ d20_face_rotation = 0;
 d20_face_scale = 100;
 
 // ^ for tweaking the placement, play with this value
-d20_face_offset = 0.0; // [-10.0:0.1:10.0]
+d20_face_offset = 0.0; // [-10.0:0.1:2.0]
 
 /* [Wall Supports] */
 supports_height = 3; // [0:10]
 // ^ height in mm for wall supports (0 for none)
 
-/* [Hidden] */
+/* [Normally Hidden] */
 
 // true to hollow out the die and cut in half
 see_supports = false;
@@ -64,9 +64,9 @@ see_supports = false;
 // true make 2d projection of the die shape
 do_projection = false;
 
-// true to rotate the die point down for printing
-// false to rotate to longest length for projections
-rotate_for_printing = true;
+generate_base = false;
+
+trim_underneath = true;
 
 d10_angle = 120; // original: 132
 
@@ -100,9 +100,9 @@ module drawWhich(which="d4") {
     if (which=="d12") draw_d12(d12_face_edge, supports_height, draw_text);
     if (which=="d20") draw_d20(d20_face_edge, supports_height, draw_text);
 
-    // cut off anything below z=0
-    translate([0, 0, 50])
-      cylinder(h=100, r1=100, r2=100, center = true);
+    if (trim_underneath) // cuts off anything below z=0
+      translate([0, 0, 50])
+        cylinder(h=100, r1=100, r2=100, center = true);
   }
 }
 

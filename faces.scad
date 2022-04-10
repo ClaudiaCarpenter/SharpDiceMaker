@@ -2,24 +2,23 @@
 //                                      d4
 //------------------------------------------------------------------------------------
 
-include <BOSL2/std.scad>
-include <BOSL2/shapes.scad>
-include <BOSL2/polyhedra.scad>
-
 module draw_d4_crystal(face_edge, support_height, do_draw_text) {
   d4_body_length = 1.25 * face_edge;
-  end_height = face_edge / 1.25;
-  die_height = d4_body_length + end_height * 2;
-  z_translation = die_height / 2 + support_height;
-  point_down_if_printing = rotate_for_printing ? [90, 0, 0] : [0, 0, 0];
+  pointy_end_height = face_edge / 1.25;
+  die_height = d4_body_length + pointy_end_height * 2;
 
-  translate([0, 0, die_height / 2 + support_height])
+  z_translation = !generate_base ? die_height / 2 + support_height : .75*face_edge;
+  point_down_if_printing = !generate_base ? [90, 0, 0] : [32, 0, 0];
+
+//  import("bases/pentagon.stl");
+
+  translate([0, 0, z_translation])
     rotate(point_down_if_printing) {
       difference() {
-        crystal(face_edge, d4_body_length, end_height, see_supports);
+      crystal(face_edge, d4_body_length, pointy_end_height, see_supports);
 
         if (do_draw_text)
-          draw_d4_text(face_edge);
+          draw_text(face_edge);
       }
     }
 
@@ -29,22 +28,22 @@ module draw_d4_crystal(face_edge, support_height, do_draw_text) {
     rotate([0, 0, 45])
       render_supports(width, height, support_height, 4);
   }
-}
 
-module draw_d4_text(height) {
-  height_multiplier = 0.75;
-  digits = ["3", "4", "2", "1"];
-  echo(-height_multiplier * font_scale / 100);
-  y_offset = -0.5 * height_multiplier * font_scale / 100;
-  for (i = [0:3]) { 
-    rotate([0, 90*i, 0])
-      rotate([90, 90, 90]) {
-        translate([0, y_offset, 0.5 * height - 1])
-          extrude_text(digits[i], height, height_multiplier);
-      }
+  module draw_text(height) {
+    height_multiplier = 0.75;
+    digits = ["3", "4", "2", "1"];
+    
+    y_offset = -0.5 * height_multiplier * font_scale / 100;
+    for (i = [0:3]) { 
+      rotate([0, 90*i, 0])
+        rotate([90, 90, 90]) {
+          translate([0, y_offset, 0.5 * height - 1])
+            extrude_text(digits[i], height, height_multiplier);
+        }
+    }
   }
-
 }
+
 
 //------------------------------------------------------------------------------------
 //                                       D6
@@ -72,7 +71,7 @@ module draw_d6(face_edge, support_height, do_draw_text) {
   }
 
   module draw_tipped_shape() {
-    point_down_if_printing = rotate_for_printing ? [45, atan(1/sqrt(2)), 0] : [0, 0, 0];
+    point_down_if_printing = !generate_base ? [45, atan(1/sqrt(2)), 0] : [0, 0, 0];
 
     rotate(point_down_if_printing) {
       difference() {
@@ -144,7 +143,7 @@ module draw_d8(face_edge, support_height, do_draw_text) {
   }
 
   module draw_tipped_shape() {
-    point_down_if_printing = rotate_for_printing ? [-54.7355, 0, 0] : [35.2645, 0, 0];
+    point_down_if_printing = !generate_base ? [-54.7355, 0, 0] : [35.2645, 0, 0];
     rotate(point_down_if_printing) {
       difference() {
         intersection() {
@@ -155,10 +154,10 @@ module draw_d8(face_edge, support_height, do_draw_text) {
             rotate([45, 35, -30])
               cube([edge_length, edge_length, edge_length], center = true);
           }
-      }
-      if (do_draw_text)
-        draw_d8_text(face_height);
-      }
+        }
+        if (do_draw_text)
+          draw_d8_text(face_height);
+        }
     }
   }
 }
@@ -223,7 +222,7 @@ module draw_d10(face_edge, support_height, is_percentile, do_draw_text) {
   }
 
   module draw_tipped_shape() {
-    point_down_if_printing = rotate_for_printing ? [312, 0, 0] : [222, 0, 0];
+    point_down_if_printing = !generate_base ? [312, 0, 0] : [222, 0, 0];
 
     rotate(point_down_if_printing) {
       difference() {
@@ -289,7 +288,7 @@ module draw_d12(face_edge, support_height, do_draw_text) {
   }
 
   module draw_tipped_shape() {
-    point_down_if_printing = rotate_for_printing ? [-37.3775, 0, 0] : [-127.3775, 0, 0];
+    point_down_if_printing = !generate_base ? [-37.3775, 0, 0] : [-127.3775, 0, 0];
     rotate(point_down_if_printing) {
       difference() {
         intersection() {
@@ -414,7 +413,6 @@ module draw_d20_text(height) {
                   extrude_text(d20_text, height, height_multiplier * d20_face_scale / 100, icon_font);
 
             } else if (d20_svg_file != "") {
-              echo(d20_face_offset * height_multiplier * d20_face_scale / 100, d20_face_offset, height_multiplier, d20_face_scale / 100);
               svg_scale_multiplier = .45 / 10000;
               render_svg(d20_svg_file, d20_face_rotation, svg_scale_multiplier * d20_face_scale * height, 4 * (d20_face_offset + height_multiplier * d20_face_scale / 100));
 

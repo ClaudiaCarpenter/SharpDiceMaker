@@ -1,11 +1,11 @@
 OPENSCAD="/Applications/OpenSCAD.app/Contents/MacOS/OpenSCAD"
-PRESETS="./SharpDiceMaker.json"
+PRESETS="./CrystalDiceMaker.json"
 DIR="./dice/$1"
 NAME=""
 
 gen_die() {
   printf "Rendering $DIR/$1.stl...\n"
-  $OPENSCAD -o $DIR/$1.stl -D "which_die=\"$1\"" -p $PRESETS -P "$NAME" SharpDiceMaker.scad
+  $OPENSCAD -o $DIR/$1.stl -D "which_die=\"$1\"" -p $PRESETS -P "$NAME" CrystalDiceMaker.scad
 }
 
 print_error() {
@@ -54,7 +54,6 @@ mkdir $DIR 2> /dev/null
 # echo Generating supported dice
 
 gen_die d4 $1
-gen_die d4c $1
 gen_die d6 $1
 gen_die d8 $1
 gen_die d10 $1

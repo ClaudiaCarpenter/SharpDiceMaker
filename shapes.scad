@@ -92,6 +92,10 @@ module tetrahedron(height, makeHollow = false) {
   }
 }
 
+include <BOSL2/std.scad>
+include <BOSL2/shapes.scad>
+include <BOSL2/polyhedra.scad>
+
 module crystal(face_edge, body_length, end_height, makeHollow = false) {
 
   if (!makeHollow) 
@@ -101,9 +105,9 @@ module crystal(face_edge, body_length, end_height, makeHollow = false) {
     rotate([90, 90, 0]) {
       if (makeHollow) {
         difference() {
-        prismoid([face_edge, face_edge], [0, 0], h=end_height);
-        translate([0, 0, -.0025])
           prismoid([face_edge, face_edge], [0, 0], h=end_height);
+          translate([0, 0, -.0025])
+            prismoid([face_edge, face_edge], [0, 0], h=end_height);
         }
       } else
         prismoid([face_edge, face_edge], [0, 0], h=end_height);
@@ -114,7 +118,6 @@ module crystal(face_edge, body_length, end_height, makeHollow = false) {
       translate([0, -body_length / 2, 0])
         rotate([90, 90, 0])
           prismoid([face_edge, face_edge], [0, 0], h=end_height);
-
 }
 
 
