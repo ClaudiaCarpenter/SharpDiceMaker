@@ -14,11 +14,13 @@ icon_font = "";
 // ^ font percentage sizing scale
 font_scale = 100;
 // ^ font spacing for numbers greater than 9
+horizontal_spacing = 1; // [0:0.1:1]
+// ^ font spacing for numbers greater than 9
 vertical_offset = 0; // [-5.0:0.1:5.0]
 // ^ true to draw the numbers, false to make blank faces
 draw_text = true;
 // ^ depth of text extrusion in mm
-extrude_depth = 1;
+extrude_depth = 1; // [0.5:0.1:2.0]
 
 /* [Which Dice + Sizes] */
 
@@ -50,13 +52,22 @@ d20_face_rotation = 0;
 d20_face_scale = 100;
 
 // ^ for tweaking the placement, play with this value
-d20_face_offset = 0.0; // [-10.0:0.1:2.0]
+d20_face_offset = 0.0; // [-10.0:0.05:2.0]
 
 /* [Wall Supports] */
-supports_height = 3; // [0:10]
+
 // ^ height in mm for wall supports (0 for none)
+supports_height = 3; // [0:10]
+
+// ^ check to have a wider base for your supports
+supports_raft = true;
+
+// ^ size in mm for wall supports connector
+supports_connecting_width = 0.2; // [0.2:0.1:1]
 
 /* [Normally Hidden] */
+show_bounding_box = false;
+
 
 // true to hollow out the die and cut in half
 see_supports = false;
@@ -87,7 +98,7 @@ d20_face_edge  = d20_height / 2;
 include <shapes.scad>
 include <faces.scad>
 
-use <fonts/numbers/Dungeon.ttf>
+use <fonts/numbers/Redressed.ttf>
 use <fonts/icons/Evilz.ttf>
 
 module drawWhich(which="d4") {

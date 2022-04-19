@@ -7,27 +7,28 @@ module draw_d4_crystal(face_edge, support_height, do_draw_text) {
   pointy_end_height = face_edge / 1.25;
   die_height = d4_body_length + pointy_end_height * 2;
 
-  z_translation = !generate_base ? die_height / 2 + support_height : .75*face_edge;
-  point_down_if_printing = !generate_base ? [90, 0, 0] : [32, 0, 0];
+  z_translation = !generate_base ? die_height / 2 + support_height : 1.55*face_edge;
+  point_down_if_printing = !generate_base ? [90, 0, 0] : [45, 0, 0];
 
-//  import("bases/pentagon.stl");
-
-  translate([0, 0, z_translation])
-    rotate(point_down_if_printing) {
-      difference() {
-      crystal(face_edge, d4_body_length, pointy_end_height, see_supports);
-
-        if (do_draw_text)
-          draw_text(face_edge);
+  if (generate_base) {
+    render_base("bases/triangle.stl", (face_edge - 2) / 7);
+  } else {
+    translate([0, 0, z_translation])
+      rotate(point_down_if_printing) {
+        difference() {
+          crystal(face_edge, d4_body_length, pointy_end_height, see_supports);
+          if (do_draw_text)
+            draw_text(face_edge);
+        }
       }
+    if (support_height > 0) {
+      width = 1.225 * face_edge;
+      height = 1.85 * triangle_height(face_edge/2);
+      rotate([0, 0, 45])
+        render_supports(width, height, support_height, 4);
     }
-
-  if (support_height > 0) {
-    width = 1.225 * face_edge;
-    height = 1.85 * triangle_height(face_edge/2);
-    rotate([0, 0, 45])
-      render_supports(width, height, support_height, 4);
   }
+  
 
   module draw_text(height) {
     height_multiplier = 0.75;
@@ -52,28 +53,33 @@ module draw_d4_crystal(face_edge, support_height, do_draw_text) {
 module draw_d6(face_edge, support_height, do_draw_text) {
 
   die_height = face_edge * sin(60);    
-  translate([0, 0, die_height + support_height]) {
-    if (see_supports) { // need to make the shape hollow
-      difference() {
-        draw_tipped_shape();
-        translate([0, 0, .0025])
-          draw_tipped_shape();
-      }
-    } else
-     draw_tipped_shape();
-  }
+  z_translation = !generate_base ? die_height + support_height : 19;
+  point_down_if_printing = !generate_base ? [45, atan(1/sqrt(2)), 0] : [8, -8, 0];
 
-  if (support_height > 0) {
-    width = sqrt(face_edge * face_edge *2 );
-    height = face_edge * 0.58;
-    rotate([0, 0, 60])
-      render_supports(width, height, support_height, 3);
+  if (generate_base) {
+    render_base("bases/cube.stl", (face_edge - 2) / 7);
+  } else {
+    translate([0, 0, z_translation]) {
+      if (see_supports) { // need to make the shape hollow
+          difference() {
+            draw_tipped_shape();
+            translate([0, 0, .0025])
+              draw_tipped_shape();
+          }
+      } else
+        draw_tipped_shape();
+    }
+  
+    if (support_height > 0) {
+      width = sqrt(face_edge * face_edge *2 );
+      height = face_edge * 0.58;
+      rotate([0, 0, 60])
+        render_supports(width, height, support_height, 3);
+    }
   }
 
   module draw_tipped_shape() {
-    point_down_if_printing = !generate_base ? [45, atan(1/sqrt(2)), 0] : [0, 0, 0];
-
-    rotate(point_down_if_printing) {
+    rotate(point_down_if_printing)
       difference() {
         intersection() {
           cube([face_edge, face_edge, face_edge], center = true);
@@ -86,9 +92,10 @@ module draw_d6(face_edge, support_height, do_draw_text) {
         if (do_draw_text)
           draw_d6_text(face_edge);
       }
-    }
   }
 }
+
+
 
 module draw_d6_text(height) {
   
@@ -124,26 +131,32 @@ module draw_d6_text(height) {
 module draw_d8(face_edge, support_height, do_draw_text) {
 
   face_height = face_edge * 0.81654872074;
-  translate ([0, 0, face_edge * 0.70715 + support_height]) {
-    if (see_supports) { // need to make the shape hollow
-      difference() {
-        draw_tipped_shape();
-        translate([0, 0, .0025])
-          draw_tipped_shape();
-      }
-    } else
-     draw_tipped_shape();
-  }
+  z_translation = !generate_base ? face_edge * 0.70715 + support_height : 19;
 
-  if (support_height > 0) {
-    width = face_edge * 1.225;
-    height = face_edge * .7075;
-    rotate([0, 0, 45])
-      render_supports(width, height, support_height, 4);
+  if (generate_base) {
+    render_base("bases/triangle.stl", (face_edge - 3.5) / 7, true);
+  } else {
+    translate ([0, 0, z_translation]) {
+      if (see_supports) { // need to make the shape hollow
+        difference() {
+          draw_tipped_shape();
+          translate([0, 0, .0025])
+            draw_tipped_shape();
+        }
+      } else
+      draw_tipped_shape();
+    }
+
+    if (support_height > 0) {
+      width = face_edge * 1.225;
+      height = face_edge * .7075;
+      rotate([0, 0, 45])
+        render_supports(width, height, support_height, 4);
+    }
   }
 
   module draw_tipped_shape() {
-    point_down_if_printing = !generate_base ? [-54.7355, 0, 0] : [35.2645, 0, 0];
+    point_down_if_printing = !generate_base ? [-54.7355, 0, 0] : [35.2645 * 2.325, 0, 0];
     rotate(point_down_if_printing) {
       difference() {
         intersection() {
@@ -203,27 +216,32 @@ module draw_d10(face_edge, support_height, is_percentile, do_draw_text) {
   digits = is_percentile ? ["40", "70", "80", "30", "20", "90", "00", "10", "60", "50"] :
                            ["0", "1", "2", "9.", "8", "3", "4", "7", "6.", "5"];
 
-  translate ([0, 0, face_edge + support_height]) {
-    if (see_supports) { // need to make the shape hollow
-      difference() {
-        draw_tipped_shape();
-        translate([0, 0, .0025])
-          draw_tipped_shape();
-      }
-    } else
-     draw_tipped_shape();
-  }
+  z_translation = !generate_base ? face_edge + support_height : 23;
+  point_down_if_printing = !generate_base ? [312, 0, 0] : [42, 36, 0];
 
-  if (support_height > 0) {
-    width = face_edge * 1.1;
-    height = face_edge * .8888888;
-    rotate([0, 0, 18])
-      render_supports(width, height, support_height, 5);
+  if (generate_base) {
+    render_base("bases/crystal.stl", (face_edge - 4) / 8, true);
+  } else {
+    translate ([0, 0, z_translation]) {
+      if (see_supports) { // need to make the shape hollow
+        difference() {
+          draw_tipped_shape();
+          translate([0, 0, .0025])
+            draw_tipped_shape();
+        }
+      } else
+      draw_tipped_shape();
+    }
+
+    if (support_height > 0) {
+      width = face_edge * 1.1;
+      height = face_edge * .8888888;
+      rotate([0, 0, 18])
+        render_supports(width, height, support_height, 5);
+    }
   }
 
   module draw_tipped_shape() {
-    point_down_if_printing = !generate_base ? [312, 0, 0] : [222, 0, 0];
-
     rotate(point_down_if_printing) {
       difference() {
         deltohedron(face_edge);
@@ -236,6 +254,20 @@ module draw_d10(face_edge, support_height, is_percentile, do_draw_text) {
   }
 }
 
+module deltohedron_text_pair(height, text_depth, digit1, digit2, height_multiplier) {
+  y_offset = -height_multiplier * font_scale/100;
+  inset_depth = 0.5 * height - text_depth;
+
+  // Draw top half
+  translate([0, y_offset, inset_depth])
+    extrude_text(digit1, height, height_multiplier);
+
+  // Draw bottom half
+  translate([0, -y_offset, -inset_depth])
+    rotate([0, 180, 180])
+      extrude_text(digit2, height, height_multiplier);
+}
+
 module deltohedron_text(height, angle, text_depth, text_push, text_offset, digits, height_multiplier) {
   
   rotate([0, 0, 72]) // makes numbers right side up
@@ -243,18 +275,7 @@ module deltohedron_text(height, angle, text_depth, text_push, text_offset, digit
       rotate([0, 0, 72 * i])
         rotate([angle, 0, 0]) {
           index = i * 2 + text_offset;
-
-          y_offset = -height_multiplier * font_scale/100;
-          inset_depth = 0.5 * height - text_depth;
-
-          // Draw top half
-          translate([0, y_offset, inset_depth])
-            extrude_text(digits[index + 1], height, height_multiplier);
-
-          // Draw bottom half
-          translate([0, -y_offset, -inset_depth])
-            rotate([0, 180, 180])
-              extrude_text(digits[index], height, height_multiplier);
+          deltohedron_text_pair(height, text_depth, digits[index + 1], digits[index], height_multiplier);
         }
     }
 }
@@ -265,30 +286,34 @@ module deltohedron_text(height, angle, text_depth, text_push, text_offset, digit
 
 module draw_d12(face_edge, support_height, do_draw_text) {
   
-  z_translation = face_edge * 0.89347 + support_height;
+  height_multiplier = .32;
   face_height = face_edge * 1.42;
-  height_multiplier = .32; //face_edge * .025 / font_scale / 100.0;
-
-  translate ([0, 0, z_translation]) {
-    if (see_supports) { // need to make the shape hollow
-      difference() {
-        draw_tipped_shape();
-        translate([0, 0, .0025])
+  z_translation = !generate_base ? face_edge * 0.89347 + support_height : 17;
+  point_down_if_printing = !generate_base ? [-37.3775, 0, 0] : [-127.3775, 0, 0];
+  
+  if (generate_base) {
+    render_base("bases/pentagon.stl", (face_edge - 2) / 7, true);
+  } else {
+    translate ([0, 0, z_translation]) {
+      if (see_supports) { // need to make the shape hollow
+        difference() {
           draw_tipped_shape();
-      }
-    } else
-     draw_tipped_shape();
-  }
+          translate([0, 0, .0025])
+            draw_tipped_shape();
+        }
+      } else
+      draw_tipped_shape();
+    }
 
-  if (support_height > 0) {
-    width = face_edge * 1.03;
-    height = face_edge * .226;
-    rotate([0, 0, 90])
-      render_supports(width, height, support_height, 3, false);
+    if (support_height > 0) {
+      width = face_edge * 1.03;
+      height = face_edge * .226;
+      rotate([0, 0, 90])
+        render_supports(width, height, support_height, 3);
+    }
   }
 
   module draw_tipped_shape() {
-    point_down_if_printing = !generate_base ? [-37.3775, 0, 0] : [-127.3775, 0, 0];
     rotate(point_down_if_printing) {
       difference() {
         intersection() {
@@ -310,15 +335,10 @@ module draw_d12_text(height, slope, height_multiplier) {
   
   text_depth = extrude_depth;
   digits = ["2", "11", "4", "9.", "6.", "7", "5", "8", "3", "10"];
+  y_offset = height_multiplier * font_scale/100;
 
-  rotate([0, 0, 180])
-    translate([0, -1, 0.5 * height - text_depth])
-      extrude_text("12", height, height_multiplier);
-
-  translate([0, -1, -0.5 * height + text_depth])
-    rotate([0, 180, 0])
-      extrude_text("1", height, height_multiplier);
-  
+  rotate([0, 0, 324]) // makes numbers right side up
+    deltohedron_text_pair(height, text_depth, "12", "1", height_multiplier);
   deltohedron_text(height, slope, 0.6, 0, height/80, digits, height_multiplier);
 }
 
@@ -328,29 +348,35 @@ module draw_d12_text(height, slope, height_multiplier) {
 
 module draw_d20(face_edge, support_height, do_draw_text) {
   
-  z_translation = face_edge * 0.9878 + support_height;
+  z_translation = !generate_base ? face_edge * 0.9878 + support_height : 23;
   face_height = face_edge * 1.56995960338;
+  point_down_if_printing = !generate_base ? [35.264, 13.285, 18] : [35.264, 13.285, 18];
   
-  translate ([0, 0, z_translation]) {
-    if (see_supports) { // need to make the shape hollow
-      difference() {
-        draw_tipped_shape();
-        translate([0, 0, .0025])
+  if (generate_base) {
+    rotate([0, 0, 180])
+    render_base("bases/triangle.stl", (face_edge - 2) / 7, true);
+  } else {
+    translate ([0, 0, z_translation]) {
+      if (see_supports) { // need to make the shape hollow
+        difference() {
           draw_tipped_shape();
-      }
-    } else
-     draw_tipped_shape();
-  } 
+          translate([0, 0, .0025])
+            draw_tipped_shape();
+        }
+      } else
+      draw_tipped_shape();
+    } 
 
-  if (support_height > 0) {
-    width = face_edge * 1.53;
-    height = face_edge * .5465;
-    rotate([0, 0, 90])
-      render_supports(width, height, support_height, 5);
+    if (support_height > 0) {
+      width = face_edge * 1.53;
+      height = face_edge * .5465;
+      rotate([0, 0, 90])
+        render_supports(width, height, support_height, 5);
+    }
   }
 
   module draw_tipped_shape() {
-    rotate([35.264, 13.285, 18]) {
+    rotate(point_down_if_printing) {
       difference() {
         intersection() {
           icosahedron(face_height);
@@ -433,14 +459,13 @@ module draw_d20_text(height) {
  //------------------------------------------------------------------------------------
 //                               Text / Image Utils
 //------------------------------------------------------------------------------------
-show_bounding_box = false;
-
 module render_svg(svg_file, svg_rotation, svg_scale, svg_offset) {
   if (show_bounding_box) {
+    echo("extrude_svg", svg_file, svg_rotation, svg_scale, svg_offset);
     extrude_it();
     %bounding_box() extrude_it();
   } else
-      extrude_it();
+    extrude_it();
 
   module extrude_it() {
     translate([0, svg_offset, -extrude_depth + 1])
@@ -453,16 +478,28 @@ module render_svg(svg_file, svg_rotation, svg_scale, svg_offset) {
 
 module extrude_text(some_text, height, multiplier, potential_font ="") {
   if (show_bounding_box) {
+    echo("extrude_text", some_text, height, multiplier, vertical_offset*multiplier, horizontal_spacing);
     extrude_it();
     %bounding_box() extrude_it();
   } else
-      extrude_it();
+    extrude_it();
 
   module extrude_it() {
-    translate([0, vertical_offset*multiplier, -extrude_depth + 1])
+    translate([0, vertical_offset * multiplier, -extrude_depth + 1])
       linear_extrude(height = extrude_depth + 1)
         text(some_text, size = height * multiplier * font_scale / 100, valign="center", halign="center", font=(len(potential_font) > 0 ? potential_font : font));
   }
+}
+
+module render_base(base_file, ratio, draw_stand = true) {
+  if (draw_stand)
+    translate([0, 0, 5])
+      rotate([180, 0, 0])
+        import("bases/base.stl");
+
+  translate([0, 0, 5])
+    scale([ratio, ratio, ratio])
+      import(base_file);
 }
 
 module bounding_box() { 

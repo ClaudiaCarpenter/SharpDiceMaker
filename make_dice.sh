@@ -15,8 +15,8 @@ print_error() {
 }
 
 show_syntax() {
-  printf "\nThis script renders a set of sharp DND dice using OpenSCAD.\n"
-  printf "\nSyntax: ./scripts/gen_set.sh \"name\" [file.json]\n"
+  printf "\nThis script renders a set of sharp-edged crystal DND dice using OpenSCAD.\n"
+  printf "\nSyntax: ./scripts/gen_dice.sh \"name\" [file.json]\n"
   printf "\n   • \"name\" is the preset stanza name of an OpenSCAD json config file (REQUIRED)\n"
   printf "   • \"file.json\" is the config file to use (optional - default: \"$PRESETS\")\n\n"
 }
