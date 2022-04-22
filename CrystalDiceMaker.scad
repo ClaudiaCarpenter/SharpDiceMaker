@@ -7,9 +7,10 @@
 // ^ trims sharp vertices, but not the edges
 cut_corners = false;
 // ^ use Help > Font List > click > Copy to Clipboard
-font = "Lato:style=Medium";
+font = "Caslon Antique:style=Regular"; // ["Antraxja  Goth 1938:style=Regular","Boismen:style=Light","Cardosan:style=Regular","Caslon Antique:style=Regular","CaslonishFraxx:style=Regular","Celtic Garamond the 2nd:style=Regular","Demons and Darlings:style=Regular","Donree's Claws:style=Regular","Dumbledor 2:style=Regular","Dungeon:style=Regular","Dragon Fire:style=Regular","Fanjofey AH:style=Regular","First Order Condensed:style=Condensed","Grusskarten Gotisch:style=Regular","Hobbiton:style=Regular","Hobbiton Brushhand:style=Hobbiton brush","Huggles:style=Regular","Kabinett Fraktur:style=Regular","KG Lego House:style=Regular","Klarissa:style=Regular","Lycanthrope:style=Regular","Manuskript Gothisch:style=Regular","Midjungards:style=Italic","Night Mare:style=Regular","October Crow:style=Regular","Old London:style=Regular","PerryGothic:style=Regular","Poppl Fraktur CAT:style=Regular","Rane Insular:style=Regular","Redressed:style=Regular","RhymeChronicle1494:style=not included.","Austie Bost Simple Simon:style=Regular","Spooky Pumpkin regular:style=Regular","Tencele Latinwa:style=Regular","Unquiet Spirits:style=Regular","White Storm:style=Regular","XalTerion:style=Regular"]
+
 // ^ whenever you're replacing a number with an icon
-icon_font = "";
+icon_font = ""; // ["axe for warrior:style=Regular","Evilz:style=Regular","ILL oCtoBer 98:style=Normal","Punkinhead:style=Regular","rpg\\-awesome:style=Regular"]
 
 // ^ font percentage sizing scale
 font_scale = 100;
@@ -20,7 +21,7 @@ vertical_offset = 0; // [-5.0:0.1:5.0]
 // ^ true to draw the numbers, false to make blank faces
 draw_text = true;
 // ^ depth of text extrusion in mm
-extrude_depth = 1; // [0.5:0.1:2.0]
+extrude_depth = 1; // [0.5:0.1:2.0]Antraxja  Goth
 
 /* [Which Dice + Sizes] */
 
@@ -52,7 +53,7 @@ d20_face_rotation = 0;
 d20_face_scale = 100;
 
 // ^ for tweaking the placement, play with this value
-d20_face_offset = 0.0; // [-10.0:0.05:2.0]
+d20_face_offset = 0.0; // [-10.0:0.05:3.0]
 
 /* [Wall Supports] */
 
@@ -81,25 +82,16 @@ trim_underneath = true;
 
 d10_angle = 120; // original: 132
 
-d4_ratio = 2.85;
-d6_ratio = 1;
-d8_ratio = 1.4;
-d10_ratio = 2;
-d12_ratio = 1.8;
-d20_ratio = 2;
-
-d4_face_edge = d4_height / 2.85;
-d6_face_edge  = d6_height / 1;
-d8_face_edge  = d8_height / 1.4;
-d10_face_edge = d10_height / 2;
-d12_face_edge  = d12_height / 1.8;
-d20_face_edge  = d20_height / 2;
+d4_face_edge = d4_height * .35125;
+d6_face_edge  = d6_height * 1;
+d8_face_edge  = d8_height * .707;
+d10_face_edge = d10_height * 0.5;
+d12_face_edge  = d12_height * 0.5597;
+d20_face_edge  = d20_height * 0.5062;
 
 include <shapes.scad>
 include <faces.scad>
-
-use <fonts/numbers/Redressed.ttf>
-use <fonts/icons/Evilz.ttf>
+include <fonts.scad>
 
 module drawWhich(which="d4") {
   intersection() {
