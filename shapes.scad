@@ -96,8 +96,7 @@ include <BOSL2/std.scad>
 include <BOSL2/shapes.scad>
 include <BOSL2/polyhedra.scad>
 
-module crystal(face_edge, body_length, end_height, makeHollow = false) {
-
+module crystal(face_edge, body_length, end_height, makeHollow = false, add_sprue) {
   if (!makeHollow) 
     cuboid([face_edge, body_length, face_edge]);
 
@@ -110,7 +109,14 @@ module crystal(face_edge, body_length, end_height, makeHollow = false) {
             prismoid([face_edge, face_edge], [0, 0], h=end_height);
         }
       } else
-        prismoid([face_edge, face_edge], [0, 0], h=end_height);
+        difference() {
+          prismoid([face_edge, face_edge], [0, 0], h=end_height);
+          if (add_sprue) {
+            echo(face_edge);
+            rotate([-40, 0, 0])
+              make_sprue_hole(0, face_edge/24, 5);
+          }
+        }
     }
 
   if (!makeHollow) 
@@ -120,16 +126,18 @@ module crystal(face_edge, body_length, end_height, makeHollow = false) {
           prismoid([face_edge, face_edge], [0, 0], h=end_height);
 }
 
+//------------------------------------------------------------------------------------
+//                                    SPRUE
+//------------------------------------------------------------------------------------
+module make_sprue_hole(x_offset, y_offset, z_offset) {
+  translate([x_offset, y_offset, z_offset])
+    rotate([-5, 0, 0])
+      cylinder(h=5, r1=1*.4, r2=2*.4, center = true, $fn=50);
+}
 
 //------------------------------------------------------------------------------------
-//                                  BASES FOR MOLDING
+//                               BASES FOR MOLDING
 //------------------------------------------------------------------------------------
-module regular_polygon(order = 4, r = 1){
-     angles=[ for (i = [0:order-1]) i*(360/order) ];
-     coords=[ for (th=angles) [r*cos(th), r*sin(th)] ];
-     polygon(coords);
- }
-
 //------------------------------------------------------------------------------------
 module render_base(length, height, width, support_offset = 0) {
   midpoint = triangle_midpoint(length);

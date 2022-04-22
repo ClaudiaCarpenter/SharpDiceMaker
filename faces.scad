@@ -16,11 +16,12 @@ module draw_d4_crystal(face_edge, support_height, do_draw_text) {
     translate([0, 0, z_translation])
       rotate(point_down_if_printing) {
         difference() {
-          crystal(face_edge, d4_body_length, pointy_end_height, see_supports);
+          crystal(face_edge, d4_body_length, pointy_end_height, see_supports, add_sprue_hole);
           if (do_draw_text)
             draw_text(face_edge);
         }
       }
+
     if (support_height > 0) {
       width = 1.225 * face_edge;
       height = 1.85 * triangle_height(face_edge/2);
@@ -79,7 +80,7 @@ module draw_d6(face_edge, support_height, do_draw_text) {
   }
 
   module draw_tipped_shape() {
-    rotate(point_down_if_printing)
+    rotate(point_down_if_printing) {
       difference() {
         intersection() {
           cube([face_edge, face_edge, face_edge], center = true);
@@ -89,36 +90,38 @@ module draw_d6(face_edge, support_height, do_draw_text) {
               octahedron(face_edge*1.625);
         }
           
-        if (do_draw_text)
-          draw_d6_text(face_edge);
+        draw_d6_text(face_edge, do_draw_text);
       }
+    }
   }
 }
 
-
-
-module draw_d6_text(height) {
+module draw_d6_text(height, do_draw_text) {
   
   height_multiplier = 0.6;
   y_offset = -height_multiplier * font_scale / 100;
   digits = ["1", "2", "3", "4", "5", "6"];
 
-  rotate([0, 0, 180])
+  rotate([0, 0, 180]) {
     translate([0, y_offset, 0.5 * height - 1])
-      extrude_text(digits[0], height, height_multiplier);
+      extrude_text(digits[0], height, height_multiplier, do_draw_text);
+
+    if (add_sprue_hole)
+      make_sprue_hole(height/2 - y_offset - 2.5, height/2 - y_offset - 2.5, 0.5 * height - 1);
+  }
 
   translate([0, -y_offset, -0.5 * height + 1])
     rotate([0, 180, 180])
-      extrude_text(digits[5], height, height_multiplier);
+      extrude_text(digits[5], height, height_multiplier, do_draw_text);
 
   for (i = [0:1]) { 
     rotate([90, 0, 90 * i]) {
       translate([0, y_offset, 0.5 * height - 1])
-        extrude_text(digits[i * 2 + 1], height, height_multiplier);
+        extrude_text(digits[i * 2 + 1], height, height_multiplier, do_draw_text);
 
       translate([0, -y_offset, -0.5 * height + 1])
         rotate([0, 180, 180])
-          extrude_text(digits[4 - i * 2], height, height_multiplier);
+          extrude_text(digits[4 - i * 2], height, height_multiplier, do_draw_text);
     }
   }
 }
@@ -168,14 +171,13 @@ module draw_d8(face_edge, support_height, do_draw_text) {
               cube([edge_length, edge_length, edge_length], center = true);
           }
         }
-        if (do_draw_text)
-          draw_d8_text(face_height);
-        }
+        draw_d8_text(face_height, do_draw_text);
+      }
     }
   }
 }
 
-module draw_d8_text(height) {
+module draw_d8_text(height, do_draw_text) {
   text_depth = extrude_depth;
   height_multiplier = 0.45;
   digits = ["4", "2", "8", "3", "6", "1", "7", "5"];
@@ -196,16 +198,19 @@ module draw_d8_text(height) {
     rotate([0, 0, -60])
       draw_pair("1", "8");
 
-  module draw_pair(first, second) {
-    rotate([0, 0, 180])
+  module draw_pair(digit1, digit2) {
+    rotate([0, 0, 180]) {
       translate([0, y_offset, 0.5 * height - text_depth])
-        extrude_text(first, height, height_multiplier);
+        extrude_text(digit1, height, height_multiplier, do_draw_text);
+        
+        if (add_sprue_hole && digit1 == "1")
+          make_sprue_hole(height/2 - 1.25, -height/4 + .25, 0.5 * height - 1);
+    }
 
     translate([0, y_offset, -0.5 * height + text_depth])
       rotate([0, 180, 0])
-        extrude_text(second, height, height_multiplier);
+        extrude_text(digit2, height, height_multiplier, do_draw_text);
   }
-
 }
 
 //------------------------------------------------------------------------------------
@@ -246,36 +251,43 @@ module draw_d10(face_edge, support_height, is_percentile, do_draw_text) {
       difference() {
         deltohedron(face_edge);
         
-        if (draw_text)
-          rotate([48, 0, 0])
-            deltohedron_text(face_edge, d10_angle, 1, -0.8*(font_scale / 100.0), 0, digits, is_percentile ? 0.3 : 0.4);
+        rotate([48, 0, 0])
+          deltohedron_text(face_edge, d10_angle, 1, -0.8*(font_scale / 100.0), 0, digits, is_percentile ? 0.3 : 0.4, do_draw_text);
       }
     }
   }
 }
 
-module deltohedron_text_pair(height, text_depth, digit1, digit2, height_multiplier) {
+module deltohedron_text_pair(height, text_depth, digit1, digit2, height_multiplier, do_draw_text) {
   y_offset = -height_multiplier * font_scale/100;
   inset_depth = 0.5 * height - text_depth;
 
   // Draw top half
-  translate([0, y_offset, inset_depth])
-    extrude_text(digit1, height, height_multiplier);
+  translate([0, y_offset, inset_depth]) {
+    extrude_text(digit1, height, height_multiplier, do_draw_text);
+
+    if (add_sprue_hole && (digit1 == "1" || digit1 == "70"))
+      make_sprue_hole(y_offset + .5, -height / 3 + y_offset, 1.5);
+   }
 
   // Draw bottom half
-  translate([0, -y_offset, -inset_depth])
-    rotate([0, 180, 180])
-      extrude_text(digit2, height, height_multiplier);
+  translate([0, -y_offset, -inset_depth]) {
+    rotate([0, 180, 180]) {
+      extrude_text(digit2, height, height_multiplier, do_draw_text);
+
+    if (add_sprue_hole && (digit2 == "1" || digit2 == "70"))
+      make_sprue_hole(-height / 3 + 2, y_offset + 1.5, 1.5);
+    }
+  }
 }
 
-module deltohedron_text(height, angle, text_depth, text_push, text_offset, digits, height_multiplier) {
-  
+module deltohedron_text(height, angle, text_depth, text_push, text_offset, digits, height_multiplier, do_draw_text) {
   rotate([0, 0, 72]) // makes numbers right side up
     for (i = [0:4]) { 
       rotate([0, 0, 72 * i])
         rotate([angle, 0, 0]) {
           index = i * 2 + text_offset;
-          deltohedron_text_pair(height, text_depth, digits[index + 1], digits[index], height_multiplier);
+          deltohedron_text_pair(height, text_depth, digits[index + 1], digits[index], height_multiplier, do_draw_text);
         }
     }
 }
@@ -324,22 +336,22 @@ module draw_d12(face_edge, support_height, do_draw_text) {
               icosahedron(face_height * 1.218);
         }
       
-        if (do_draw_text)
-          draw_d12_text(face_height, 116.565, height_multiplier);
+        draw_d12_text(face_height, 116.565, height_multiplier, do_draw_text);
       }
     }
   }
 }
 
-module draw_d12_text(height, slope, height_multiplier) {
+module draw_d12_text(height, slope, height_multiplier, do_draw_text) {
   
   text_depth = extrude_depth;
   digits = ["2", "11", "4", "9.", "6.", "7", "5", "8", "3", "10"];
   y_offset = height_multiplier * font_scale/100;
 
   rotate([0, 0, 324]) // makes numbers right side up
-    deltohedron_text_pair(height, text_depth, "12", "1", height_multiplier);
-  deltohedron_text(height, slope, 0.6, 0, height/80, digits, height_multiplier);
+    deltohedron_text_pair(height, text_depth, "12", "1", height_multiplier, do_draw_text);
+
+  deltohedron_text(height, slope, 0.6, 0, height/80, digits, height_multiplier, do_draw_text);
 }
 
 //------------------------------------------------------------------------------------
@@ -386,14 +398,13 @@ module draw_d20(face_edge, support_height, do_draw_text) {
               dodecahedron(face_height*1.2,116.565,1);
         }
         
-        if (do_draw_text)
-          draw_d20_text(face_height);
+        draw_d20_text(face_height, do_draw_text);
       }
     }
   }
 }
 
-module draw_d20_text(height) {
+module draw_d20_text(height, do_draw_text) {
 
   rotate([70.5288, 0, 60])
     draw_face(height, 0);
@@ -430,25 +441,27 @@ module draw_d20_text(height) {
       y_offset = -height_multiplier * font_scale/100;
 
       rotate([0, 0, 39])
-        translate([0, y_offset, 0.5 * height - 1])
+        translate([0, y_offset, 0.5 * height - 1]) {
           if (d20_replace_digit > 0 && str(d20_replace_digit) == digit) {
-
             if (d20_text != "") {
               rotate([0, 0, d20_face_rotation])
                 translate([0, -d20_face_offset])
-                  extrude_text(d20_text, height, height_multiplier * d20_face_scale / 100, icon_font);
+                  extrude_text(d20_text, height, height_multiplier * d20_face_scale / 100, icon_font, do_draw_text);
 
             } else if (d20_svg_file != "") {
               svg_scale_multiplier = .45 / 10000;
               render_svg(d20_svg_file, d20_face_rotation, svg_scale_multiplier * d20_face_scale * height, 4 * (d20_face_offset + height_multiplier * d20_face_scale / 100));
 
             } else {
-              extrude_text(digit, height, height_multiplier);
+              extrude_text(digit, height, height_multiplier, do_draw_text);
             }
-            
           } else {
-            extrude_text(digit, height, height_multiplier);
+            extrude_text(digit, height, height_multiplier, do_draw_text);
           }
+          if (add_sprue_hole && digit == "1") {
+            make_sprue_hole(-height / 5, y_offset - 2, 1.5);
+          }
+        }
     }
   }
 }
@@ -459,13 +472,15 @@ module draw_d20_text(height) {
  //------------------------------------------------------------------------------------
 //                               Text / Image Utils
 //------------------------------------------------------------------------------------
-module render_svg(svg_file, svg_rotation, svg_scale, svg_offset) {
-  if (show_bounding_box) {
-    echo("extrude_svg", svg_file, svg_rotation, svg_scale, svg_offset);
-    extrude_it();
-    %bounding_box() extrude_it();
-  } else
-    extrude_it();
+module render_svg(svg_file, svg_rotation, svg_scale, svg_offset, do_draw_text) {
+  if (do_draw_text) {
+    if (show_bounding_box) {
+      echo("extrude_svg", svg_file, svg_rotation, svg_scale, svg_offset);
+      extrude_it();
+      %bounding_box() extrude_it();
+    } else
+      extrude_it();
+  }
 
   module extrude_it() {
     translate([0, svg_offset, -extrude_depth + 1])
@@ -476,13 +491,15 @@ module render_svg(svg_file, svg_rotation, svg_scale, svg_offset) {
   }
 }
 
-module extrude_text(some_text, height, multiplier, potential_font ="") {
-  if (show_bounding_box) {
-    echo("extrude_text", some_text, height, multiplier, vertical_offset*multiplier, horizontal_spacing);
-    extrude_it();
-    %bounding_box() extrude_it();
-  } else
-    extrude_it();
+module extrude_text(some_text, height, multiplier, do_draw_text, potential_font ="") {
+ if (do_draw_text) {
+    if (show_bounding_box) {
+      echo("extrude_text", some_text, height, multiplier, vertical_offset*multiplier, horizontal_spacing);
+      extrude_it();
+      %bounding_box() extrude_it();
+    } else
+      extrude_it();
+  }
 
   module extrude_it() {
     translate([0, vertical_offset * multiplier, -extrude_depth + 1])

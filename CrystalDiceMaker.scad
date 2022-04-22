@@ -38,7 +38,7 @@ d20_height  = 28;
 /* [D20 SVGs] */
 
 // ^ to replace a digit on your d20 with an svg or text, first pick which digit:
-d20_replace_digit = 1; // [0:20]
+d20_replace_digit = 0; // [0:20]
 
 // ^ then, enter the text:
 d20_text = "";
@@ -77,6 +77,8 @@ see_supports = false;
 do_projection = false;
 
 generate_base = false;
+
+add_sprue_hole = true;
 
 trim_underneath = true;
 
