@@ -96,7 +96,7 @@ include <BOSL2/std.scad>
 include <BOSL2/shapes.scad>
 include <BOSL2/polyhedra.scad>
 
-module crystal(face_edge, body_length, end_height, makeHollow = false, add_sprue) {
+module crystal(face_edge, body_length, end_height, makeHollow = false, add_sprue, sprue_diameter = 2, sprue_angle = -5) {
   if (!makeHollow) 
     cuboid([face_edge, body_length, face_edge]);
 
@@ -112,9 +112,8 @@ module crystal(face_edge, body_length, end_height, makeHollow = false, add_sprue
         difference() {
           prismoid([face_edge, face_edge], [0, 0], h=end_height);
           if (add_sprue) {
-            echo(face_edge);
             rotate([-40, 0, 0])
-              make_sprue_hole(0, face_edge/24, 5);
+              make_sprue_hole(0, face_edge/24, 5, sprue_diameter, sprue_angle);
           }
         }
     }
@@ -129,10 +128,28 @@ module crystal(face_edge, body_length, end_height, makeHollow = false, add_sprue
 //------------------------------------------------------------------------------------
 //                                    SPRUE
 //------------------------------------------------------------------------------------
-module make_sprue_hole(x_offset, y_offset, z_offset) {
+module make_sprue_hole(x_offset, y_offset, z_offset, hole_diameter, angle = 0) {
   translate([x_offset, y_offset, z_offset])
-    rotate([-5, 0, 0])
-      cylinder(h=5, r1=1*.4, r2=2*.4, center = true, $fn=50);
+    rotate([angle, 0, 0])
+      cylinder(h = 5, r1 = hole_diameter * 0.5, r2 = hole_diameter * 0.5, center = true, $fn = hole_diameter * 25);
+}
+
+module generate_sprue(hole_diameter) {
+  height_tip = 2;
+  height_trans = 20;
+  height_body = 6;
+  width_body = hole_diameter / 2 * 3;
+
+  scale([0.95, 0.95, 1]) { // wiggle room
+    translate([0, 0, height_body + height_trans])
+      cylinder(h = height_tip, r1 = hole_diameter * 0.5, r2 = hole_diameter * 0.5, center = false, $fn = hole_diameter * 25);
+
+    translate([0, 0, height_body])
+      cylinder(h = height_trans, r1 = width_body, r2 = hole_diameter * 0.5, center = false, $fn = hole_diameter * 25);
+
+    translate([0, 0, 0])
+      cylinder(h = height_body, r1 = width_body, r2 = width_body, center = false, $fn = hole_diameter * 25);
+  }
 }
 
 //------------------------------------------------------------------------------------

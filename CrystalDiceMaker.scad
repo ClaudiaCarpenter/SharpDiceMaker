@@ -7,7 +7,7 @@
 // ^ trims sharp vertices, but not the edges
 cut_corners = false;
 // ^ use Help > Font List > click > Copy to Clipboard
-font = "Caslon Antique:style=Regular"; // ["Antraxja  Goth 1938:style=Regular","Boismen:style=Light","Cardosan:style=Regular","Caslon Antique:style=Regular","CaslonishFraxx:style=Regular","Celtic Garamond the 2nd:style=Regular","Demons and Darlings:style=Regular","Donree's Claws:style=Regular","Dumbledor 2:style=Regular","Dungeon:style=Regular","Dragon Fire:style=Regular","Fanjofey AH:style=Regular","First Order Condensed:style=Condensed","Grusskarten Gotisch:style=Regular","Hobbiton:style=Regular","Hobbiton Brushhand:style=Hobbiton brush","Huggles:style=Regular","Kabinett Fraktur:style=Regular","KG Lego House:style=Regular","Klarissa:style=Regular","Lycanthrope:style=Regular","Manuskript Gothisch:style=Regular","Midjungards:style=Italic","Night Mare:style=Regular","October Crow:style=Regular","Old London:style=Regular","PerryGothic:style=Regular","Poppl Fraktur CAT:style=Regular","Rane Insular:style=Regular","Redressed:style=Regular","RhymeChronicle1494:style=not included.","Austie Bost Simple Simon:style=Regular","Spooky Pumpkin regular:style=Regular","Tencele Latinwa:style=Regular","Unquiet Spirits:style=Regular","White Storm:style=Regular","XalTerion:style=Regular"]
+font = "Caslon Antique:style=Regular"; // ["Antraxja  Goth 1938:style=Regular","Amita:style=Regular","Boismen:style=Light","Cardosan:style=Regular","Caslon Antique:style=Regular","CaslonishFraxx:style=Regular","Celtic Garamond the 2nd:style=Regular","Demons and Darlings:style=Regular","Linotype Didot:style=Bold","Donree's Claws:style=Regular","Dumbledor 2:style=Regular","Dungeon:style=Regular","Dragon Fire:style=Regular","Fanjofey AH:style=Regular","First Order Condensed:style=Condensed","Grusskarten Gotisch:style=Regular","Hobbiton:style=Regular","Hobbiton Brushhand:style=Hobbiton brush","Huggles:style=Regular","Kabinett Fraktur:style=Regular","KG Lego House:style=Regular","Klarissa:style=Regular","Lycanthrope:style=Regular","Manuskript Gothisch:style=Regular","Midjungards:style=Italic","Night Mare:style=Regular","October Crow:style=Regular","Old London:style=Regular","PerryGothic:style=Regular","Poppl Fraktur CAT:style=Regular","Rane Insular:style=Regular","Redressed:style=Regular","RhymeChronicle1494:style=not included.","Austie Bost Simple Simon:style=Regular","Spooky Pumpkin regular:style=Regular","Tencele Latinwa:style=Regular","Unquiet Spirits:style=Regular","White Storm:style=Regular","XalTerion:style=Regular"]
 
 // ^ whenever you're replacing a number with an icon
 icon_font = ""; // ["axe for warrior:style=Regular","Evilz:style=Regular","ILL oCtoBer 98:style=Normal","Punkinhead:style=Regular","rpg\\-awesome:style=Regular"]
@@ -79,6 +79,9 @@ do_projection = false;
 generate_base = false;
 
 add_sprue_hole = true;
+sprue_diameter = 2;
+sprue_angle = -5;
+generate_sprues = false;
 
 trim_underneath = true;
 
@@ -96,19 +99,23 @@ include <faces.scad>
 include <fonts.scad>
 
 module drawWhich(which="d4") {
-  intersection() {
-    if (which=="d4") draw_d4_crystal(d4_face_edge, supports_height, draw_text);
-    if (which=="d6") draw_d6(d6_face_edge, supports_height, draw_text);
-    if (which=="d8") draw_d8(d8_face_edge, supports_height, draw_text);
-    if (which=="d10")  draw_d10(d10_face_edge, supports_height, false, draw_text);
-    if (which=="d100") draw_d10(d10_face_edge, supports_height, true, draw_text);
-    if (which=="d12") draw_d12(d12_face_edge, supports_height, draw_text);
-    if (which=="d20") draw_d20(d20_face_edge, supports_height, draw_text);
+  spacing = 10;
+  if (generate_sprues) {
+    generate_sprue(sprue_diameter);
+  } else
+    intersection() {
+      if (which=="d4") draw_d4_crystal(d4_face_edge, supports_height, draw_text);
+      if (which=="d6") draw_d6(d6_face_edge, supports_height, draw_text);
+      if (which=="d8") draw_d8(d8_face_edge, supports_height, draw_text);
+      if (which=="d10")  draw_d10(d10_face_edge, supports_height, false, draw_text);
+      if (which=="d100") draw_d10(d10_face_edge, supports_height, true, draw_text);
+      if (which=="d12") draw_d12(d12_face_edge, supports_height, draw_text);
+      if (which=="d20") draw_d20(d20_face_edge, supports_height, draw_text);
 
-    if (trim_underneath) // cuts off anything below z=0
-      translate([0, 0, 50])
-        cylinder(h=100, r1=100, r2=100, center = true);
-  }
+      if (trim_underneath) // cuts off anything below z=0
+        translate([0, 0, 50])
+          cylinder(h=100, r1=100, r2=100, center = true);
+    }
 }
 
 drawWhich(which_die);
