@@ -178,37 +178,34 @@ module render_base(length, height, width, support_offset = 0) {
 //                                SUPPORTS FOR PRINTING
 //------------------------------------------------------------------------------------
 base_height = 2;
-support_color = "black";
 
-module render_supports(length, height, support_offset, num = 3) {
+module render_snap_off_supports(length, height, support_offset, num = 3) {
   rotate_by = 360 / num;
-  
-  // super-thin fin that touches the die in the middle
-  color("blue", 1) 
-    for (i = [0 : num])
-      rotate([0, 0, i * rotate_by]) 
-        render_support(length, height+.1, .15, support_offset);
+  width = 1;
 
-  // super-thin fin that touches the die in the middle
-  color("green", 1) 
-    for (i = [0 : num])
-      rotate([0, 0, i * rotate_by]) 
-        render_support(length, height+.1, .2, support_offset, 2);
+  // bar support that touches the edge  
+  for (i = [0 : num])
+    rotate([0, 0, i * rotate_by]) {
+      render_support_bar(length, height, support_offset);
+    }
 
-  // thin fin that touches the die
-  color(support_color, 1) 
-    for (i = [0 : num])
-      rotate([0, 0, i * rotate_by]) 
-        render_support(length, height+.1, supports_connecting_width, support_offset, 3.5);
+  // central support that touches the bottom point
+  translate([0, 0, support_offset]) cylinder(h=.5, r1=.25, r2=.35, $fn=num, center = false);
+  cylinder(h=support_offset + .2, r1=.1, r2=.1, $fn=num, center = false);
+  cylinder(h=support_offset - .5, r1=.5, r2=.25, $fn=num, center = false);
+
+  // thin fin that snaps off below the bar
+  for (i = [0 : num])
+    rotate([0, 0, i * rotate_by]) 
+      render_support(length, height, supports_connecting_width, support_offset);
 
   // step-wise, angled taper for added stability
-  color(support_color, 0.25) 
-    for (i = [0 : num])
-      rotate([0, 0, i * rotate_by]) {
-        for (j = [0 : 5])
-          translate([0, 0, -1])
-            render_support(length, height-j, supports_connecting_width*(j+1), support_offset);
-      }      
+  for (i = [0 : num])
+    rotate([0, 0, i * rotate_by]) {
+      for (j = [1 : 5])
+        translate([0, 0, -1])
+          render_support(length, height-j, supports_connecting_width*(j+1), support_offset - j * .5);
+    }      
 
   if (supports_raft) {
     render_raft(length, support_offset, num);
@@ -216,15 +213,44 @@ module render_supports(length, height, support_offset, num = 3) {
 }
 
 //------------------------------------------------------------------------------------
-module render_support(length, height, depth, support_offset = 0, center_start = 0) {
+module render_support_bar(length, height, support_offset = 0, center_start = 1) {
+  right_side = triangle_midpoint(length);
+  diameter = .5;
+  clip_by = .1;
+  y_offset = .1;
+  
+  bar_points = [
+    [0, support_offset - diameter / 2],     
+    [0, support_offset + diameter / 2],
+    [right_side, height + support_offset + diameter / 2],
+    [right_side, height + support_offset - diameter / 2]
+  ];
+
+  clipping_points = [
+    [center_start, 0],
+    [center_start, height + 10],
+    [right_side, height + 10],
+    [right_side, 0]
+  ];
+
+  rotate([90, 0, 0]) 
+    linear_extrude(height = diameter, center = true)
+      intersection() {
+        polygon(points = bar_points);
+        polygon(points = clipping_points);
+      }
+}
+
+//------------------------------------------------------------------------------------
+module render_support(length, height, depth, support_offset = 0, y_start = 0, center_start = 1) {
   midpoint = triangle_midpoint(length);
   clip_by = .1;
   
   triangle_points = [
-      [0, 0],                               // lower left
+      [0, y_start],                         // lower left
       [0, support_offset + .1],             // upper left
       [midpoint, height + support_offset],  // upper right 
-      [midpoint, 0]                         // lower right
+      [midpoint, y_start]                   // lower right
   ];
 
   clipping_points = [
@@ -247,7 +273,7 @@ module render_raft(length, support_offset, num) {
   raft_width = 5;
 
   // short, fat fin that touches the plate
-  color(support_color, .75) 
+  //color(support_color, .75) 
     for (i = [0 : num])
       rotate([0, 0, i * rotate_by]) 
         translate([-raft_width/2, -raft_width/2, -1])

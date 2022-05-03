@@ -25,7 +25,7 @@ module draw_d4_crystal(face_edge, support_height, do_draw_text) {
       width = 1.225 * face_edge;
       height = 1.85 * triangle_height(face_edge/2);
       rotate([0, 0, 45])
-        render_supports(width, height, support_height, 4);
+        render_snap_off_supports(width, height, support_height, 4);
     }
   }
   
@@ -74,7 +74,7 @@ module draw_d6(face_edge, support_height, do_draw_text) {
       width = sqrt(face_edge * face_edge *2 );
       height = face_edge * 0.58;
       rotate([0, 0, 60])
-        render_supports(width, height, support_height, 3);
+        render_snap_off_supports(width, height, support_height, 3);
     }
   }
 
@@ -155,7 +155,7 @@ module draw_d8(face_edge, support_height, do_draw_text) {
       width = face_edge * 1.225;
       height = face_edge * .7075;
       rotate([0, 0, 45])
-        render_supports(width, height, support_height, 4);
+        render_snap_off_supports(width, height, support_height, 4);
     }
   }
 
@@ -240,10 +240,10 @@ module draw_d10(face_edge, support_height, is_percentile, do_draw_text) {
     }
 
     if (support_height > 0) {
-      width = face_edge * 1.1;
+      width = face_edge * 1.12;
       height = face_edge * .8888888;
       rotate([0, 0, 18])
-        render_supports(width, height, support_height, 5);
+        render_snap_off_supports(width, height, support_height, 5);
     }
   }
 
@@ -322,7 +322,7 @@ module draw_d12(face_edge, support_height, do_draw_text) {
       width = face_edge * 1.03;
       height = face_edge * .226;
       rotate([0, 0, 90])
-        render_supports(width, height, support_height, 3);
+        render_snap_off_supports(width, height, support_height, 3);
     }
   }
 
@@ -381,7 +381,7 @@ module draw_d20(face_edge, support_height, do_draw_text) {
       width = face_edge * 1.53;
       height = face_edge * .5465;
       rotate([0, 0, 90])
-        render_supports(width, height, support_height, 5);
+        render_snap_off_supports(width, height, support_height, 5);
     }
   }
 
@@ -495,7 +495,7 @@ module render_svg(svg_file, svg_rotation, svg_scale, svg_offset, do_draw_text) {
 module extrude_text(some_text, height, multiplier, do_draw_text, potential_font ="") {
  if (do_draw_text) {
     if (show_bounding_box) {
-      echo("extrude_text", some_text, height, multiplier, vertical_offset*multiplier, horizontal_spacing);
+      echo("extrude_text", some_text, height, multiplier, vertical_offset*multiplier);
       extrude_it();
       %bounding_box() extrude_it();
     } else
@@ -503,7 +503,6 @@ module extrude_text(some_text, height, multiplier, do_draw_text, potential_font 
   }
 
   module extrude_it() {
-  color("green")
     translate([0, vertical_offset * multiplier, -extrude_depth + 1])
       linear_extrude(height = extrude_depth + 1)
         text(some_text, size = height * multiplier * font_scale / 100, valign="center", halign="center", font=(potential_font != "" ? potential_font : font));

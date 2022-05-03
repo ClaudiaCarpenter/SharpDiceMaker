@@ -15,13 +15,11 @@ icon_font = ""; // ["axe for warrior:style=Regular","Evilz:style=Regular","ILL o
 // ^ font percentage sizing scale
 font_scale = 100;
 // ^ font spacing for numbers greater than 9
-horizontal_spacing = 1; // [0:0.1:1]
-// ^ font spacing for numbers greater than 9
 vertical_offset = 0; // [-5.0:0.1:5.0]
 // ^ true to draw the numbers, false to make blank faces
 draw_text = true;
 // ^ depth of text extrusion in mm
-extrude_depth = 1; // [0.5:0.1:2.0]Antraxja  Goth
+extrude_depth = 1.6; // [0.5:0.1:2.0]Antraxja  Goth
 
 /* [Which Dice + Sizes] */
 
