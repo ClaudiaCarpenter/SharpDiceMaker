@@ -25,7 +25,7 @@ module draw_d4_crystal(face_edge, support_height, do_draw_text) {
       width = 1.225 * face_edge;
       height = 1.85 * triangle_height(face_edge/2);
       rotate([0, 0, 45])
-        render_snap_off_supports(width, height, support_height, 4);
+        render_supports(width, height, support_height, 4);
     }
   }
   
@@ -74,7 +74,7 @@ module draw_d6(face_edge, support_height, do_draw_text) {
       width = sqrt(face_edge * face_edge *2 );
       height = face_edge * 0.58;
       rotate([0, 0, 60])
-        render_snap_off_supports(width, height, support_height, 3);
+        render_supports(width, height, support_height, 3);
     }
   }
 
@@ -155,7 +155,7 @@ module draw_d8(face_edge, support_height, do_draw_text) {
       width = face_edge * 1.225;
       height = face_edge * .7075;
       rotate([0, 0, 45])
-        render_snap_off_supports(width, height, support_height, 4);
+        render_supports(width, height, support_height, 4);
     }
   }
 
@@ -243,7 +243,7 @@ module draw_d10(face_edge, support_height, is_percentile, do_draw_text) {
       width = face_edge * 1.12;
       height = face_edge * .8888888;
       rotate([0, 0, 18])
-        render_snap_off_supports(width, height, support_height, 5);
+        render_supports(width, height, support_height, 5);
     }
   }
 
@@ -322,7 +322,7 @@ module draw_d12(face_edge, support_height, do_draw_text) {
       width = face_edge * 1.03;
       height = face_edge * .226;
       rotate([0, 0, 90])
-        render_snap_off_supports(width, height, support_height, 3);
+        render_supports(width, height, support_height, 3);
     }
   }
 
@@ -381,11 +381,12 @@ module draw_d20(face_edge, support_height, do_draw_text) {
       width = face_edge * 1.53;
       height = face_edge * .5465;
       rotate([0, 0, 90])
-        render_snap_off_supports(width, height, support_height, 5);
+        render_supports(width, height, support_height, 5);
     }
   }
 
   module draw_tipped_shape() {
+    //color("gray")
     rotate(point_down_if_printing) {
       difference() {
         intersection() {
@@ -395,7 +396,7 @@ module draw_d20(face_edge, support_height, do_draw_text) {
             rotate([-10, 35, -28])
               dodecahedron(face_height*1.2,116.565,1);
         }
-        
+        //color("white")
         draw_d20_text(face_height, do_draw_text);
       }
     }
@@ -440,11 +441,13 @@ module draw_d20(face_edge, support_height, do_draw_text) {
           translate([0, y_offset, 0.5 * height - 1]) {
             if (d20_replace_digit > 0 && str(d20_replace_digit) == digit) {
               if (d20_text != "") {
+                echo("icon_text");
                 rotate([0, 0, d20_face_rotation])
                   translate([0, -d20_face_offset])
-                    extrude_text(d20_text, height, height_multiplier * d20_face_scale / 100, icon_font, do_draw_text);
+                    extrude_text(d20_text, height, height_multiplier * d20_face_scale / 100, do_draw_text, icon_font);
 
               } else if (d20_svg_file != "") {
+                echo("svg");
                 svg_scale_multiplier = .45 / 10000;
                 render_svg(d20_svg_file, d20_face_rotation, svg_scale_multiplier * d20_face_scale * height, 4 * (d20_face_offset + height_multiplier * d20_face_scale / 100));
 
@@ -456,8 +459,8 @@ module draw_d20(face_edge, support_height, do_draw_text) {
             }
 
             if (add_sprue_hole && digit == "1") {
-              x_offset = -height * 0.25 + sprue_diameter / 2 + 1;
-              y_offset = -triangle_height(height) * 0.22 + sprue_diameter / 2 + 1;
+              x_offset = -height * 0.22 + sprue_diameter / 2 + 1;
+              y_offset = -triangle_height(height) * 0.18 + sprue_diameter / 2 + 1;
               make_sprue_hole(x_offset, y_offset, 1.5, sprue_diameter, sprue_angle);
             }
         }
@@ -473,13 +476,13 @@ module draw_d20(face_edge, support_height, do_draw_text) {
  //------------------------------------------------------------------------------------
 //                               Text / Image Utils
 //------------------------------------------------------------------------------------
-module render_svg(svg_file, svg_rotation, svg_scale, svg_offset, do_draw_text) {
-  if (do_draw_text) {
-    if (show_bounding_box) {
-      echo("extrude_svg", svg_file, svg_rotation, svg_scale, svg_offset);
+module render_svg(svg_file, svg_rotation, svg_scale, svg_offset, do_draw_text = true) {
+    echo("extrude_svg", svg_file, svg_rotation, svg_scale, svg_offset);
+ if (do_draw_text) {
+     if (show_bounding_box) {
       extrude_it();
       %bounding_box() extrude_it();
-    } else
+    } else 
       extrude_it();
   }
 
@@ -495,7 +498,7 @@ module render_svg(svg_file, svg_rotation, svg_scale, svg_offset, do_draw_text) {
 module extrude_text(some_text, height, multiplier, do_draw_text, potential_font ="") {
  if (do_draw_text) {
     if (show_bounding_box) {
-      echo("extrude_text", some_text, height, multiplier, vertical_offset*multiplier);
+      // echo("extrude_text", some_text, height, multiplier, vertical_offset*multiplier);
       extrude_it();
       %bounding_box() extrude_it();
     } else
@@ -503,6 +506,7 @@ module extrude_text(some_text, height, multiplier, do_draw_text, potential_font 
   }
 
   module extrude_it() {
+    b = (potential_font != "" ? potential_font : font);
     translate([0, vertical_offset * multiplier, -extrude_depth + 1])
       linear_extrude(height = extrude_depth + 1)
         text(some_text, size = height * multiplier * font_scale / 100, valign="center", halign="center", font=(potential_font != "" ? potential_font : font));

@@ -7,7 +7,7 @@
 // ^ trims sharp vertices, but not the edges
 cut_corners = false;
 // ^ use Help > Font List > click > Copy to Clipboard
-font = "Caslon Antique:style=Regular"; // ["Antraxja  Goth 1938:style=Regular","Amita:style=Regular","Boismen:style=Light","Cardosan:style=Regular","Caslon Antique:style=Regular","CaslonishFraxx:style=Regular","Celtic Garamond the 2nd:style=Regular","Demons and Darlings:style=Regular","Linotype Didot:style=Bold","Donree's Claws:style=Regular","Dumbledor 2:style=Regular","Dungeon:style=Regular","Dragon Fire:style=Regular","Fanjofey AH:style=Regular","First Order Condensed:style=Condensed","Grusskarten Gotisch:style=Regular","Hobbiton:style=Regular","Hobbiton Brushhand:style=Hobbiton brush","Huggles:style=Regular","Kabinett Fraktur:style=Regular","KG Lego House:style=Regular","Klarissa:style=Regular","Lycanthrope:style=Regular","Manuskript Gothisch:style=Regular","Midjungards:style=Italic","Night Mare:style=Regular","October Crow:style=Regular","Old London:style=Regular","PerryGothic:style=Regular","Poppl Fraktur CAT:style=Regular","Rane Insular:style=Regular","Redressed:style=Regular","RhymeChronicle1494:style=not included.","Austie Bost Simple Simon:style=Regular","Spooky Pumpkin regular:style=Regular","Tencele Latinwa:style=Regular","Unquiet Spirits:style=Regular","White Storm:style=Regular","XalTerion:style=Regular"]
+font = "Caslon Antique:style=Regular"; // ["Antraxja  Goth 1938:style=Regular","Amita:style=Regular","Bloody Stump:style=Regular","Boismen:style=Light","Cardosan:style=Regular","Caslon Antique:style=Regular","CaslonishFraxx:style=Regular","Celtic Garamond the 2nd:style=Regular","Demons and Darlings:style=Regular","Linotype Didot:style=Bold","Donree's Claws:style=Regular","Dumbledor 2:style=Regular","Dungeon:style=Regular","Dragon Fire:style=Regular","Fanjofey AH:style=Regular","First Order Condensed:style=Condensed","Grusskarten Gotisch:style=Regular","Hobbiton:style=Regular","Hobbiton Brushhand:style=Hobbiton brush","Huggles:style=Regular","Kabinett Fraktur:style=Regular","KG Lego House:style=Regular","Klarissa:style=Regular","Lycanthrope:style=Regular","Manuskript Gothisch:style=Regular","Midjungards:style=Italic","Night Mare:style=Regular","October Crow:style=Regular","Old London:style=Regular","PerryGothic:style=Regular","Poppl Fraktur CAT:style=Regular","Rane Insular:style=Regular","Redressed:style=Regular","RhymeChronicle1494:style=not included.","Austie Bost Simple Simon:style=Regular","Spooky Pumpkin regular:style=Regular","Spooky Skeleton:style=Regular","Tencele Latinwa:style=Regular","Unquiet Spirits:style=Regular","White Storm:style=Regular","XalTerion:style=Regular"]
 
 // ^ whenever you're replacing a number with an icon
 icon_font = ""; // ["axe for warrior:style=Regular","Evilz:style=Regular","ILL oCtoBer 98:style=Normal","Punkinhead:style=Regular","rpg\\-awesome:style=Regular"]
@@ -17,7 +17,7 @@ font_scale = 100;
 // ^ font spacing for numbers greater than 9
 vertical_offset = 0; // [-5.0:0.1:5.0]
 // ^ true to draw the numbers, false to make blank faces
-draw_text = true;
+draw_text = false;
 // ^ depth of text extrusion in mm
 extrude_depth = 1.6; // [0.5:0.1:2.0]Antraxja  Goth
 
@@ -34,7 +34,7 @@ d12_height  = 23;
 d20_height  = 28;
 
 /* [D20 SVGs] */
-
+  
 // ^ to replace a digit on your d20 with an svg or text, first pick which digit:
 d20_replace_digit = 0; // [0:20]
 
@@ -69,7 +69,7 @@ show_bounding_box = false;
 
 
 // true to hollow out the die and cut in half
-see_supports = false;
+see_supports = true;
 
 // true make 2d projection of the die shape
 do_projection = false;
@@ -77,7 +77,7 @@ do_projection = false;
 generate_base = false;
 
 add_sprue_hole = true;
-sprue_diameter = 2;
+sprue_diameter = 1;
 sprue_angle = -5;
 generate_sprues = false;
 
@@ -93,6 +93,7 @@ d12_face_edge  = d12_height * 0.5597;
 d20_face_edge  = d20_height * 0.5062;
 
 include <shapes.scad>
+//include <supports.scad>
 include <faces.scad>
 include <fonts.scad>
 
