@@ -54,10 +54,13 @@ mkdir $DIR 2> /dev/null
 # echo Generating supported dice
 
 gen_die d4 $1
+gen_die d4c $1
 gen_die d6 $1
 gen_die d8 $1
 gen_die d10 $1
+gen_die d10c $1
 gen_die d100 $1
+gen_die d100c $1
 gen_die d12 $1
 gen_die d20 $1
 

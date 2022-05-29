@@ -14,12 +14,12 @@ module dodecahedron(height, slope, cutoff) {
     }
 }
 
-module deltohedron(height) {
+module deltohedron(height, angle) {
     cut_modifier = 1.43;
     
     rotate([48, 0, 0])
     intersection() {
-        dodecahedron(height, d10_angle, 2);
+        dodecahedron(height, angle, 2);
         
         if (cut_corners)
             cylinder(
@@ -243,4 +243,5 @@ module render_raft(length, support_offset, num) {
 }
 
 function triangle_height(edge_length) = edge_length * sqrt(3) / 2;
+function triangle_edge(height) = height / sqrt(3) * 2;
 function triangle_midpoint(edge_length) = edge_length * sqrt(3) / 3;
