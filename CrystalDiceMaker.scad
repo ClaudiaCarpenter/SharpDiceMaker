@@ -11,19 +11,25 @@ cut_corners = false;
 which_die = "d20"; //  ["d4","d4c","d6","d8","d10","d10c","d100","d100c","d12","d20"]
 
 // ^ use Help > Font List > click > Copy to Clipboard
-font = "Caslon Antique:style=Regular"; // ["Antraxja  Goth 1938:style=Regular","Amita:style=Regular","Bloody Stump:style=Regular","Boismen:style=Light","Cardosan:style=Regular","Caslon Antique:style=Regular","CaslonishFraxx:style=Regular","Celtic Garamond the 2nd:style=Regular","Demons and Darlings:style=Regular","Linotype Didot:style=Bold","Donree's Claws:style=Regular","Dumbledor 2:style=Regular","Dungeon:style=Regular","Dragon Fire:style=Regular","Fanjofey AH:style=Regular","First Order Condensed:style=Condensed","Grusskarten Gotisch:style=Regular","Hobbiton:style=Regular","Hobbiton Brushhand:style=Hobbiton brush","Huggles:style=Regular","Kabinett Fraktur:style=Regular","KG Lego House:style=Regular","Klarissa:style=Regular","Lycanthrope:style=Regular","Manuskript Gothisch:style=Regular","Midjungards:style=Italic","Night Mare:style=Regular","October Crow:style=Regular","Old London:style=Regular","PerryGothic:style=Regular","Poppl Fraktur CAT:style=Regular","Rane Insular:style=Regular","Redressed:style=Regular","RhymeChronicle1494:style=not included.","Austie Bost Simple Simon:style=Regular","Spooky Pumpkin regular:style=Regular","Spooky Skeleton:style=Regular","Tencele Latinwa:style=Regular","Unquiet Spirits:style=Regular","White Storm:style=Regular","XalTerion:style=Regular"]
+font = "Dice\\-Digits:style=Regular"; // ["Antraxja  Goth 1938:style=Regular","Amita:style=Regular","Argos MF:style=Regular","Bloody Stump:style=Regular","Boismen:style=Light","Cardosan:style=Regular","Caslon Antique:style=Regular","C[0, 180, 60]aslonishFraxx:style=Regular","Celtic Garamond the 2nd:style=Regular","Demons and Darlings:style=Regular","Linotype Didot:style=Bold","Dice\\-Digits:style=Regular", "Donree's Claws:style=Regular","Dumbledor 2:style=Regular","Dunbar Tall:style=Regular","Dungeon:style=Regular","Dice\\-Digits:style=Regular","Dragon Fire:style=Regular","Fanjofey AH:style=Regular","First Order Condensed:style=Condensed","Gothic\\-Numbers:style=Regular","Grusskarten Gotisch:style=Regular","Hobbiton:style=Regular","Hobbiton Brushhand:style=Hobbiton brush","Huggles:style=Regular","Kabinett Fraktur:style=Regular","KG Lego House:style=Regular","Klarissa:style=Regular","Lycanthrope:style=Regular","Manuskript Gothisch:style=Regular","Midjungards:style=Italic","Night Mare:style=Regular","October Crow:style=Regular","Old London:style=Regular","PerryGothic:style=Regular","Poppl Fraktur CAT:style=Regular","Pretty\\-Numbers:style=Regular","Rane Insular:style=Regular","Redressed:style=Regular","RhymeChronicle1494:style=not included.","Austie Bost Simple Simon:style=Regular","Spooky Pumpkin regular:style=Regular","Spooky Skeleton:style=Regular","Tencele Latinwa:style=Regular","Unquiet Spirits:style=Regular","White Storm:style=Regular","XalTerion:style=Regular"]
 
 // ^ whenever you're replacing a number with an icon
 icon_font = ""; // ["axe for warrior:style=Regular","Evilz:style=Regular","ILL oCtoBer 98:style=Normal","Punkinhead:style=Regular","rpg\\-awesome:style=Regular"]
 
 // ^ font percentage sizing scale
-font_scale = 100;
+font_scale = 80;
 // ^ tweak this to align numbers vertically
 vertical_offset = 0; // [-5.0:0.1:5.0]
 // ^ true to draw the numbers, false to make blank faces
-draw_text = false;
+draw_text = true;
+// ^ tweak until the 4 looks right
+offset_four_by = 2; // [-5.0:0.1:5.0]
 // ^ depth of text extrusion in mm
-extrude_depth = 1.6; // [0.5:0.1:2.0]Antraxja  Goth
+extrude_depth = 1.6; // [0.5:0.1:2.0]
+// ^ tweak until the sprue looks right
+offset_sprue_x = 0; // [-10.0:0.1:10.0]
+// ^ tweak until the sprue looks right
+offset_sprue_y = 0; // [-10.0:0.1:10.0]
 
 /* [Which Dice + Sizes] */
 
@@ -51,7 +57,7 @@ d20_svg_file = "svg/scull_crossbones.svg";
 d20_face_rotation = 0;
 
 // ^ percentage sizing scale
-d20_face_scale = 100;
+d20_face_scale = 90;
 
 // ^ for tweaking the placement, play with this value
 d20_face_offset = 0.0; // [-10.0:0.05:3.0]
@@ -67,6 +73,9 @@ draw_supports = true;
 // ^ check to have a wider base for your supports
 supports_raft = true;
 
+// ^ height in mm
+supports_raft_height = 1;
+
 // ^ size in mm for wall supports connector
 supports_connecting_width = 0.2; // [0.2:0.1:1]
 
@@ -75,7 +84,7 @@ show_bounding_box = false;
 
 
 // true to hollow out the die and cut in half
-see_supports = true;
+see_supports = false;
 
 // true make 2d projection of the die shape
 do_projection = false;
@@ -83,8 +92,8 @@ do_projection = false;
 generate_base = false;
 
 add_sprue_hole = true;
-sprue_diameter = 1;
-sprue_angle = -5;
+sprue_diameter = 2;  // [.25:0.1:5.0]
+sprue_angle = 0;
 generate_sprues = false;
 
 trim_underneath = true;
@@ -95,8 +104,7 @@ include <faces.scad>
 include <fonts.scad>
 
 d4_face_edge = triangle_edge(d4_height);
-echo(d4_height, d4_face_edge);
-d4c_face_edge = d4c_height; // * .35125;
+d4c_face_edge = d4c_height;
 d6_face_edge  = d6_height * 1;
 d8_face_edge  = d8_height * .707;
 d10_face_edge = d10_height * 0.68;

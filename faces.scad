@@ -14,28 +14,38 @@ module draw_d4t(face_edge, support_height, do_draw_text) {
   point_down_if_printing = !generate_base ? [0, 180, 60] : [0, 0, 210];
   
   if (generate_base) {
-    render_base("bases/triangle.stl", (face_edge - 2) / 7);
+    render_shape(3, face_edge - 2, triangle_height(face_edge) - 2);
   } else {
     translate([0, 0, z_translation])
-      rotate(point_down_if_printing)
-        difference() {
-          intersection() {
-            tetrahedron(d4_face_edge);
-            if (cut_corners)
-              rotate([0, 180, 0])
-                tetrahedron(d4_face_edge * 3 * 0.85);
+      if (see_supports) { // need to make the shape hollow
+          difference() {
+            draw_tipped_shape();
+            translate([0, 0, .0025])
+              draw_tipped_shape();
           }
-          
-          if (do_draw_text)
-            draw_d4_text(d4_face_edge, do_draw_text);
-        }
+      } else
+        draw_tipped_shape();
 
     if (draw_supports) {
-      width = d4_face_edge;
-      height = triangle_height(d4_face_edge) * .944;
-echo(width=width, height=height);
-     render_supports(width, height, support_height, 3);
-    }
+      width = d4_face_edge * 1.005;
+      height = triangle_height(d4_face_edge) * .95;
+      render_supports(width, height, support_height, 3);
+     }
+  }
+
+  module draw_tipped_shape() {
+    rotate(point_down_if_printing)
+      difference() {
+        intersection() {
+          tetrahedron(d4_face_edge);
+          if (cut_corners)
+            rotate([0, 180, 0])
+              tetrahedron(d4_face_edge * 3 * 0.85);
+        }
+        
+        if (do_draw_text)
+          draw_d4_text(d4_face_edge, do_draw_text);
+      }
   }
 
   module draw_d4_text(height, do_draw_text) {
@@ -45,7 +55,7 @@ echo(width=width, height=height);
               "4", "1", "3"];
 
     height_multiplier = 0.24;
-    text_depth = 0.6;
+    text_depth = extrude_depth;
     text_push = 0.26;
 
     rotate([180, 0, 0])
@@ -57,7 +67,7 @@ echo(width=width, height=height);
           rotate([0, 0, 120 * i])
             translate([text_push * height, 0, 0])
               rotate([0, 0, -90])
-                extrude_text(digits[i], height, height_multiplier, do_draw_text);
+                extrude_text(digits[i], height, height_multiplier, do_draw_text, offset_four_by);
         }
       }
       for (j = [0:2]) { 
@@ -67,7 +77,7 @@ echo(width=width, height=height);
               rotate([0, 0, 120 * i])
                 translate([text_push * height - 0.5, 0, 0])
                   rotate([0, 0, -90])
-                    extrude_text(digits[(j + 1) * 3 + i], height, height_multiplier, do_draw_text);
+                    extrude_text(digits[(j + 1) * 3 + i], height, height_multiplier, do_draw_text, offset_four_by);
             }
       }
   }
@@ -82,12 +92,12 @@ module draw_d4c(die_height, support_height, do_draw_text) {
   point_down_if_printing = !generate_base ? [90, 0, 0] : [45, 0, 0];
 
   if (generate_base) {
-    render_base("bases/triangle.stl", (die_height - 2) / 7);
+    render_shape(4, d4_body_width - 3, d4_body_length - 3);
   } else {
     translate([0, 0, z_translation])
       rotate(point_down_if_printing) {
         difference() {
-          crystal(d4_body_width, d4_body_length, pointy_end_height, see_supports, add_sprue_hole, sprue_diameter, sprue_angle);
+          crystal(d4_body_width, d4_body_length, pointy_end_height, see_supports, false);
           draw_text(d4_body_width, do_draw_text);
         }
       }
@@ -109,8 +119,12 @@ module draw_d4c(die_height, support_height, do_draw_text) {
     for (i = [0:3]) { 
       rotate([0, 90*i, 0])
         rotate([90, 90, 90]) {
-          translate([0, y_offset, 0.5 * height - 1])
-            extrude_text(digits[i], height, height_multiplier, do_draw_text);
+          translate([0, y_offset, 0.5 * height - 1]) {
+            extrude_text(digits[i], height, height_multiplier, do_draw_text, offset_four_by);
+              if (digits[i] == "1" && add_sprue_hole) {
+                make_sprue_hole(d4_body_width * .25, d4_body_length * .25, 0, sprue_diameter, sprue_angle);
+              }
+            }
         }
     }
   }
@@ -128,7 +142,7 @@ module draw_d6(face_edge, support_height, do_draw_text) {
   point_down_if_printing = !generate_base ? [45, atan(1/sqrt(2)), 0] : [8, -8, 0];
 
   if (generate_base) {
-    render_base("bases/cube.stl", (face_edge - 2) / 7);
+    render_shape(4, face_edge - 3, face_edge - 3);
   } else {
     translate([0, 0, z_translation]) {
       if (see_supports) { // need to make the shape hollow
@@ -174,26 +188,26 @@ module draw_d6_text(height, do_draw_text) {
 
   rotate([0, 0, 180]) {
     translate([0, y_offset, 0.5 * height - 1])
-      extrude_text(digits[0], height, height_multiplier, do_draw_text);
+      extrude_text(digits[0], height, height_multiplier, do_draw_text, offset_four_by);
 
     if (add_sprue_hole) {
       sprue_offset = height * 0.5 - sprue_diameter - 0.5 - 1;
-      make_sprue_hole(sprue_offset, sprue_offset, 0.5 * height - 1, sprue_diameter, -sprue_angle);
+      make_sprue_hole(sprue_offset, sprue_offset, 0.5 * height - 1, sprue_diameter, 0);
     }
   }
 
   translate([0, -y_offset, -0.5 * height + 1])
     rotate([0, 180, 180])
-      extrude_text(digits[5], height, height_multiplier, do_draw_text);
+      extrude_text(digits[5], height, height_multiplier, do_draw_text, offset_four_by);
 
   for (i = [0:1]) { 
     rotate([90, 0, 90 * i]) {
       translate([0, y_offset, 0.5 * height - 1])
-        extrude_text(digits[i * 2 + 1], height, height_multiplier, do_draw_text);
+        extrude_text(digits[i * 2 + 1], height, height_multiplier, do_draw_text, offset_four_by);
 
       translate([0, -y_offset, -0.5 * height + 1])
         rotate([0, 180, 180])
-          extrude_text(digits[4 - i * 2], height, height_multiplier, do_draw_text);
+          extrude_text(digits[4 - i * 2], height, height_multiplier, do_draw_text, offset_four_by);
     }
   }
 }
@@ -209,7 +223,7 @@ module draw_d8(face_edge, support_height, do_draw_text) {
   z_translation = !generate_base ? face_edge * 0.70715 + support_height : 19;
 
   if (generate_base) {
-    render_base("bases/triangle.stl", (face_edge - 3.5) / 7, true);
+    render_shape(3, face_edge - 3, triangle_height(face_edge) - 3);
   } else {
     translate ([0, 0, z_translation]) {
       if (see_supports) { // need to make the shape hollow
@@ -273,18 +287,19 @@ module draw_d8_text(height, do_draw_text) {
   module draw_pair(digit1, digit2) {
     rotate([0, 0, 180]) {
       translate([0, y_offset, 0.5 * height - text_depth])
-        extrude_text(digit1, height, height_multiplier, do_draw_text);
+        extrude_text(digit1, height, height_multiplier, do_draw_text, offset_four_by * 2);
         
         if (add_sprue_hole && digit1 == "1") {
-          x = height * 0.5 - sprue_diameter * 0.5 - 1.75;
-          y = -(height * 0.65 - sprue_diameter * 0.5) + 3.5 - vertical_offset;
+          width = triangle_edge(height);
+          x = -(width * 0.38 - sprue_diameter * 1.5);
+          y = x / 2;
           make_sprue_hole(x, y, 0.5 * height - 1, sprue_diameter, sprue_angle);
         }
     }
 
     translate([0, y_offset, -0.5 * height + text_depth])
       rotate([0, 180, 0])
-        extrude_text(digit2, height, height_multiplier, do_draw_text);
+        extrude_text(digit2, height, height_multiplier, do_draw_text, offset_four_by * 2);
   }
 }
 
@@ -303,7 +318,7 @@ module draw_d10(face_edge, support_height, is_percentile, do_draw_text, is_cryst
 
 
   if (generate_base) {
-    render_base("bases/crystal.stl", (face_edge - 4) / 8, true);
+    render_shape(4, face_edge - 2.5, face_edge - 2.5, is_crystal);
   } else {
     translate ([0, 0, z_translation]) {
       if (see_supports) { // need to make the shape hollow
@@ -331,7 +346,7 @@ module draw_d10(face_edge, support_height, is_percentile, do_draw_text, is_cryst
       difference() {
         deltohedron(face_edge, angle);
         rotate([48, 0, 0])
-          deltohedron_text(face_edge, angle, 1, -0.8*(font_scale / 100.0), 0, digits, is_percentile ? 0.3 : 0.4, do_draw_text, !is_crystal ? 2 : 0);
+          deltohedron_text(face_edge, angle, extrude_depth, -0.8*(font_scale / 100.0), 0, digits, is_percentile ? 0.3 : 0.4, do_draw_text, !is_crystal ? 2 : 0, 0, is_crystal ? -.75 : .25);
       }
     }
   }
@@ -354,23 +369,22 @@ module deltohedron_text_pair(height, text_depth, digit1, digit2, height_multipli
 
   // Draw top half
   translate([0, y_offset, inset_depth]) {
-    extrude_text(digit1, height, height_multiplier, do_draw_text);
+    extrude_text(digit1, height, height_multiplier, do_draw_text, offset_four_by);
     maybe_add_sprue_hole(digit1, sprue_offset_x, sprue_offset_y);
   }
 
   // Draw bottom half
   translate([0, -y_offset, -inset_depth]) {
     rotate([0, 180, 180]) {
-      extrude_text(digit2, height, height_multiplier, do_draw_text);
+      extrude_text(digit2, height, height_multiplier, do_draw_text, offset_four_by);
       maybe_add_sprue_hole(digit2, sprue_offset_x, sprue_offset_y);
     }
   }
 
   module maybe_add_sprue_hole(digit, sprue_offset_x, sprue_offset_y) {
     if (add_sprue_hole && (digit == "1" || digit == "70")) {
-      echo(sprue_offset_x, sprue_offset_y);
       x = sprue_offset_x;
-      y = -height / 6 + vertical_offset + sprue_offset_y;
+      y = -height / 2.75 + vertical_offset + sprue_offset_y;
       color("black", .9) make_sprue_hole(x, y, 1.5, sprue_diameter, sprue_angle);
     }
   }
@@ -382,13 +396,13 @@ module deltohedron_text_pair(height, text_depth, digit1, digit2, height_multipli
 
 module draw_d12(face_edge, support_height, do_draw_text) {
   
-  height_multiplier = .35;
+  height_multiplier = .32;
   face_height = face_edge * 1.42;
   z_translation = !generate_base ? face_edge * 0.89347 + support_height : 17;
   point_down_if_printing = !generate_base ? [-37.3775, 0, 0] : [-127.3775, 0, 0];
   
   if (generate_base) {
-    render_base("bases/pentagon.stl", (face_edge - 2) / 7, true);
+    render_shape(5, face_edge / 2 -1);
   } else {
     translate ([0, 0, z_translation]) {
       if (see_supports) { // need to make the shape hollow
@@ -428,11 +442,10 @@ module draw_d12(face_edge, support_height, do_draw_text) {
 
 module draw_d12_text(height, slope, height_multiplier, do_draw_text) {
   digits = ["2", "11", "4", "9.", "6.", "7", "5", "8", "3", "10"];
- echo(height * height_multiplier);
   rotate([0, 0, 324]) // makes numbers right side up
-    deltohedron_text_pair(height, extrude_depth, "12", "1", height_multiplier, do_draw_text, 0, -height * height_multiplier * .5, height * height_multiplier * 1.2);
+    deltohedron_text_pair(height, extrude_depth, "12", "1", height_multiplier, do_draw_text, 0, -height * height_multiplier * 0.5, height * height_multiplier * 1.33);
 
-  deltohedron_text(height, slope, 0.6, 0, height/80, digits, height_multiplier, do_draw_text, 0);
+  deltohedron_text(height, slope, extrude_depth, 0, height/80, digits, height_multiplier, do_draw_text, 0); //
 }
 
 //------------------------------------------------------------------------------------
@@ -443,11 +456,11 @@ module draw_d20(face_edge, support_height, do_draw_text) {
   
   z_translation = !generate_base ? face_edge * 0.9878 + support_height : 23;
   face_height = face_edge * 1.56995960338;
-  point_down_if_printing = !generate_base ? [35.264, 13.285, 18] : [35.264, 13.285, 18];
+  point_down_if_printing = [0, 0, 0]; //!generate_base ? [35.264, 13.285, 18] : [35.264, 13.285, 18];
   
   if (generate_base) {
     rotate([0, 0, 180])
-    render_base("bases/triangle.stl", (face_edge - 2) / 7, true);
+      render_shape(3, face_edge - 2, triangle_height(face_edge) - 2);
   } else {
     translate ([0, 0, z_translation]) {
       if (see_supports) { // need to make the shape hollow
@@ -519,30 +532,20 @@ module draw_d20(face_edge, support_height, do_draw_text) {
       module draw_numbers(height, digit) {
         height_multiplier = .22;
         y_offset = -height_multiplier * font_scale/100;
+        z_offset = 0.5 * height - 1;
 
         rotate([0, 0, 39])
-          translate([0, y_offset, 0.5 * height - 1]) {
-            if (d20_replace_digit > 0 && str(d20_replace_digit) == digit) {
-              if (d20_text != "") {
-                echo("icon_text");
-                rotate([0, 0, d20_face_rotation])
-                  translate([0, -d20_face_offset])
-                    extrude_text(d20_text, height, height_multiplier * d20_face_scale / 100, do_draw_text, icon_font);
-
-              } else if (d20_svg_file != "") {
-                svg_scale_multiplier = .45 / 10000;
-                render_svg(d20_svg_file, d20_face_rotation, svg_scale_multiplier * d20_face_scale * height, 4 * (d20_face_offset + height_multiplier * d20_face_scale / 100));
-
-              } else {
-                extrude_text(digit, height, height_multiplier, do_draw_text);
-              }
+          translate([0, y_offset, z_offset]) {
+            if (d20_replace_digit > 0 && str(d20_replace_digit) == digit && d20_svg_file != "") {
+              svg_scale_multiplier = .45 / 10000;
+              render_svg(d20_svg_file, d20_face_rotation, svg_scale_multiplier * d20_face_scale * height, 4 * (d20_face_offset + height_multiplier * d20_face_scale / 100));
             } else {
-              extrude_text(digit, height, (digit == "20") ? height_multiplier * d20_face_scale / 100 : height_multiplier, do_draw_text);
+              extrude_text(digit, height, (digit == "20") ? height_multiplier * d20_face_scale / 100 : height_multiplier, do_draw_text, offset_four_by);
             }
 
             if (add_sprue_hole && digit == "1") {
-              x_offset = -height * 0.22 + sprue_diameter / 2 + 1;
-              y_offset = -triangle_height(height) * 0.18 + sprue_diameter / 2 + 1;
+              x_offset = -height * 0.2 + sprue_diameter / 2 + 1;
+              y_offset = -triangle_height(height) * 0.15 + sprue_diameter / 2 + 1;
               make_sprue_hole(x_offset, y_offset, 1.5, sprue_diameter, sprue_angle);
             }
         }
@@ -578,10 +581,10 @@ module render_svg(svg_file, svg_rotation, svg_scale, svg_offset, do_draw_text = 
   }
 }
 
-module extrude_text(some_text, height, multiplier, do_draw_text, potential_font ="") {
+module extrude_text(some_text, height, multiplier, do_draw_text, offset_four) {
  if (do_draw_text) {
     if (show_bounding_box) {
-      // echo("extrude_text", some_text, height, multiplier, vertical_offset*multiplier);
+      echo("extrude_text", some_text, height, multiplier, vertical_offset*multiplier);
       extrude_it();
       %bounding_box() extrude_it();
     } else
@@ -589,22 +592,51 @@ module extrude_text(some_text, height, multiplier, do_draw_text, potential_font 
   }
 
   module extrude_it() {
-    b = (potential_font != "" ? potential_font : font);
-    translate([0, vertical_offset * multiplier, -extrude_depth + 1])
+    size = height * multiplier * font_scale / 100;
+    x = (some_text == "4") ? offset_four : 0;
+    translate([x, vertical_offset * multiplier, -extrude_depth + 1])
       linear_extrude(height = extrude_depth + 1)
-        text(some_text, size = height * multiplier * font_scale / 100, valign="center", halign="center", font=(potential_font != "" ? potential_font : font));
+        text(some_text, size = height * multiplier * font_scale / 100, valign="center", halign="center", font=font);
   }
 }
 
-module render_base(base_file, ratio, draw_stand = true) {
-  if (draw_stand)
+module render_base(base_file, ratio, draw_stand = false) {
+  echo("render_base", base_file, ratio);
+
+  translate([0, 0, draw_stand ? 5 : 0])
+    scale([ratio, ratio, ratio])
+      import(base_file);
+}
+
+module render_shape(num, width, height, is_crystal = -1) {
+
+  color("gray")
     translate([0, 0, 5])
       rotate([180, 0, 0])
         import("bases/base.stl");
 
-  translate([0, 0, 5])
-    scale([ratio, ratio, ratio])
-      import(base_file);
+  if (num == 3)
+    render_polygon([[0, height/2], [width/2, -height/2], [-width/2, -height/2], [0, height/2]]);
+
+  else if (num == 4) {
+    if (is_crystal != -1) {
+      y_top = (is_crystal ? .26 : .221) * width;
+      y_bottom = (is_crystal ? 1.02 : .88) * width;
+      x_side = (is_crystal ? .37 : .44) * width;
+      render_polygon([[0, -y_top], [x_side, 0], [0, y_bottom], [-x_side, 0], [0, -y_top]]);
+
+    } else
+      render_polygon([[-width/2, height/2], [width/2, height/2], [width/2, -height/2], [-width/2, -height/2], [-width/2, height/2]]);
+
+  } else
+    render_polygon(pentagon(width));
+
+  module render_polygon(points) {
+  color("white")
+    translate([0, 0, 7])
+      linear_extrude(height = 5, center = true) 
+        polygon(points = points);
+  }
 }
 
 module bounding_box() { 

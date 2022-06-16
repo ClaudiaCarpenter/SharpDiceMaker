@@ -113,7 +113,7 @@ module crystal(face_edge, body_length, end_height, makeHollow = false, add_sprue
           prismoid([face_edge, face_edge], [0, 0], h=end_height);
           if (add_sprue) {
             rotate([-40, 0, 0])
-              make_sprue_hole(0, face_edge/24, 5, sprue_diameter, sprue_angle);
+              make_sprue_hole(0, face_edge/10, 5, sprue_diameter, -45);
           }
         }
     }
@@ -129,7 +129,7 @@ module crystal(face_edge, body_length, end_height, makeHollow = false, add_sprue
 //                                    SPRUE
 //------------------------------------------------------------------------------------
 module make_sprue_hole(x_offset, y_offset, z_offset, hole_diameter, angle = 0) {
-  translate([x_offset, y_offset, z_offset])
+  translate([x_offset+offset_sprue_x, y_offset+offset_sprue_y, z_offset])
     rotate([angle, 0, 0])
       cylinder(h = 5, r1 = hole_diameter * 0.5, r2 = hole_diameter * 0.5, center = true, $fn = hole_diameter * 25);
 }
@@ -157,6 +157,7 @@ module generate_sprue(hole_diameter) {
 //------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------
 module render_base(length, height, width, support_offset = 0) {
+  
   midpoint = triangle_midpoint(length);
   size = length / 2;
   
@@ -178,68 +179,60 @@ module render_base(length, height, width, support_offset = 0) {
 //                                SUPPORTS FOR PRINTING
 //------------------------------------------------------------------------------------
 base_height = 2;
-support_color = "black";
+support_color = "LightSlateGray";
 
-module render_supports(length, height, support_offset, num = 3) {
+module render_supports(width, height, support_offset, num = 3) {
   rotate_by = 360 / num;
   
-  // thin fin that touches the die
-  color(support_color) 
+  if (supports_raft)
+    render_raft(width, support_offset, num);
+
+  depth = .1;
+  num_steps = support_offset * 2;
+
+  color("white") 
     for (i = [0 : num])
       rotate([0, 0, i * rotate_by]) 
-        render_support(length, height+.1, supports_connecting_width, support_offset);
+        translate([-depth, 0, 0])
+          render_support(width + depth, height + depth, supports_connecting_width, support_offset);
 
-  // step-wise taper for added stability
-  color(support_color, 0.5) 
-    for (i = [0 : num])
-      rotate([0, 0, i * rotate_by]) {
-        for (j = [0 : 5])
-          translate([0, 0, -j])
-            render_support(length, height, supports_connecting_width*(j+1), support_offset);
-      }      
-
-  *if (supports_raft) {
-    render_raft(length, support_offset, num);
-  }
+  for (i = [0 : num])
+    rotate([0, 0, i * rotate_by]) {
+      for (j = [3 : num_steps])
+        translate([-depth, 0, -j])
+          color(support_color, 1 - j / num_steps)
+            render_support(width + depth, height + depth, supports_connecting_width*(j+1), support_offset);
+    }      
 }
 
 //------------------------------------------------------------------------------------
-module render_support(length, height, depth, support_offset = 0, center_start = 0) {
+module render_support(length, height, depth, support_offset = 0) {
   midpoint = triangle_midpoint(length);
-  clip_by = .1;
-  
+
   triangle_points = [
       [0, 0],                               // lower left
-      [0, support_offset + .1],             // upper left
-      [midpoint, height + support_offset],  // upper right 
-      [midpoint, 0]                         // lower right
-  ];
-
-  clipping_points = [
-      [clip_by + center_start, 0],           // lower left
-      [clip_by + center_start, height + support_offset],   // upper left
+      [0, support_offset],             // upper left
       [midpoint, height + support_offset],  // upper right 
       [midpoint, 0]                         // lower right
   ];
 
   rotate([90, 0, 0]) 
     linear_extrude(height=depth, center = true)
-      intersection() {
         polygon(points = triangle_points);
-        polygon(points = clipping_points);
-      }
+
 }
 
 module render_raft(length, support_offset, num) {
   rotate_by = 360 / num;
-  raft_width = 5;
+  raft_width = 3;
+  raft_length = length * .6;
 
   // short, fat fin that touches the plate
-  color(support_color, .75) 
+  color(support_color) 
     for (i = [0 : num])
       rotate([0, 0, i * rotate_by]) 
-        translate([-raft_width/2, -raft_width/2, -1])
-          cube(size = [length/2 + raft_width,  raft_width, 2], center = false);
+        translate([0, -raft_width/2, 0])
+          cube(size = [raft_length, raft_width, supports_raft_height], center = false);
 }
 
 function triangle_height(edge_length) = edge_length * sqrt(3) / 2;

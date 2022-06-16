@@ -26,7 +26,6 @@ use <fonts/numbers/OctoberCrow.ttf>
 use <fonts/numbers/Redressed.ttf>
 use <fonts/numbers/UnquietSpirits.ttf>
 use <fonts/numbers/CaslonAntique.ttf>
-use <fonts/numbers/Dungeon.ttf>
 use <fonts/numbers/KGLegoHouse.ttf>
 use <fonts/numbers/ManuskriptGothisch.ttf>
 use <fonts/numbers/OldLondon.ttf>
@@ -40,6 +39,10 @@ use <fonts/numbers/hobbiton.ttf>
 use <fonts/numbers/hobbitonbrushhand.ttf>
 use <fonts/numbers/huggles.ttf>
 use <fonts/numbers/raneinsular.ttf>
+use <fonts/numbers/Dice-Digits.ttf>
+use <fonts/numbers/DunbarTall-Regular.ttf>
+use <fonts/numbers/Pretty-Numbers.ttf>
+use <fonts/numbers/Gothic-Numbers.ttf>
 
 use <fonts/icons/Evilz.ttf>
 use <fonts/icons/AxeForWarrior.ttf>
