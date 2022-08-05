@@ -8,13 +8,9 @@
 cut_corners = false;
 // ^ use Help > Font List > click > Copy to Clipboard
 font = "Lato:style=Medium";
-// ^ whenever you're replacing a number with an icon
-icon_font = "";
 
 // ^ font percentage sizing scale
 font_scale = 100;
-// ^ font spacing for numbers greater than 9
-font_two_digit_spacing = 100;
 // ^ true to draw the numbers, false to make blank faces
 draw_text = true;
 // ^ depth of text extrusion in mm
@@ -32,24 +28,12 @@ d10_height = 30;
 d12_height  = 23;
 d20_height  = 28;
 
-/* [D20 SVGs] */
+/* [D20] */
 
-// ^ to replace a digit on your d20 with an svg or text, first pick which digit:
 d20_replace_digit = 1; // [0:20]
-
-// ^ then, enter the text:
-d20_text = "";
-
-// ^ OR enter the path to the file:
 d20_svg_file = "svg/scull_crossbones.svg";
-
-// ^ helpful if the svg has an end that's wider than the other
 d20_face_rotation = 0;
-
-// ^ percentage sizing scale
 d20_face_scale = 100;
-
-// ^ for tweaking the placement, play with this value
 d20_face_offset = 0.0; // [-10.0:0.1:10.0]
 
 /* [Wall Supports] */

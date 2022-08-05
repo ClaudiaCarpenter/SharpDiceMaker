@@ -169,9 +169,6 @@ module draw_d8_text(height, do_draw_text) {
     rotate([0, 0, 180]) {
       translate([0, y_offset, 0.5 * height - text_depth])
         extrude_text(digit1, height, height_multiplier, do_draw_text);
-        
-        if (add_sprue_hole && digit1 == "1")
-          make_sprue_hole(height * 0.5 - sprue_diameter * 0.5 - 1.5, -(height * 0.5 - sprue_diameter * 0.5) + 3.2, 0.5 * height - 1, sprue_diameter, sprue_angle);
     }
 
     translate([0, y_offset, -0.5 * height + text_depth])
@@ -232,19 +229,12 @@ module deltohedron_text_pair(height, text_depth, digit1, digit2, height_multipli
   // Draw top half
   translate([0, y_offset, inset_depth]) {
     extrude_text(digit1, height, height_multiplier, do_draw_text);
-
-    if (add_sprue_hole && (digit1 == "1" || digit1 == "70"))
-      make_sprue_hole(y_offset + .5, -height / 3 + y_offset, 1.5, sprue_diameter, sprue_angle);
-   }
+  }
 
   // Draw bottom half
   translate([0, -y_offset, -inset_depth]) {
     rotate([0, 180, 180]) {
       extrude_text(digit2, height, height_multiplier, do_draw_text);
-
-    if (add_sprue_hole && (digit2 == "1" || digit2 == "70"))
-      make_sprue_hole(height / 3 - sprue_diameter * 0.5 - .75, y_offset + sprue_diameter * 0.5, 1.5, sprue_diameter, sprue_angle);
-    }
   }
 }
 
