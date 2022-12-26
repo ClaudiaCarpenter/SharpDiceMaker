@@ -45,6 +45,7 @@ use <fonts/numbers/Dice-Digits.ttf>
 use <fonts/numbers/DunbarTall-Regular.ttf>
 use <fonts/numbers/Pretty-Numbers.ttf>
 use <fonts/numbers/Gothic-Numbers.ttf>
+use <fonts/numbers/petrock-thinner.ttf>
 
 use <fonts/icons/Evilz.ttf>
 use <fonts/icons/AxeForWarrior.ttf>

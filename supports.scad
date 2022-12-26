@@ -106,6 +106,7 @@ module render_raft(length, support_offset, num) {
 //------------------------------------------------------------------------------------
 
 module make_sprue_hole(x_offset, y_offset, z_offset, hole_diameter, angle = 0) {
+  echo("make_sprue_hole", x_offset, y_offset, z_offset, hole_diameter, angle);
   translate([x_offset, y_offset, z_offset])
     rotate([angle, 0, 0])
       cylinder(h = 5, r1 = hole_diameter * 0.5, r2 = hole_diameter * 0.5, center = true, $fn = hole_diameter * 25);

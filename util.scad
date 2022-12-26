@@ -11,22 +11,19 @@ module render_svg(svg_file, svg_rotation, svg_scale, svg_offset, do_draw_text = 
   }
 
   module extrude_it() {
-    echo("rendering", svg_file);
+    // echo("rendering", svg_file);
     translate([0, svg_offset, -extrude_depth + 1])
       rotate([0, 0, svg_rotation])
         scale([svg_scale, svg_scale, 1])
           linear_extrude(height = extrude_depth + 1)
             import(svg_file, center = true);
-      echo("rendered", svg_file);
+      // echo("rendered", svg_file);
   }
 }
 
-module extrude_text(some_text, font_scale, vertical_offset, height, multiplier, do_draw_text, offset_four, extrude_depth_override = extrude_depth) {
-
-
+module extrude_text(some_text, font_scale, vertical_offset, height, multiplier, do_draw_text, offset_four, extrude_multiplier = 1) {
   if (do_draw_text) {
     if (show_bounding_box) {
-      echo("extrude_text", some_text, height, multiplier, vertical_offset*multiplier);
       extrude_it();
       %bounding_box() extrude_it();
     } else
@@ -34,14 +31,15 @@ module extrude_text(some_text, font_scale, vertical_offset, height, multiplier, 
   } else echo("Skipping text");
 
   module extrude_it() {
+    depth = make_face_text_deeper ? extrude_depth * extrude_multiplier : extrude_depth;
     size = height * multiplier * font_scale / 100;
     has_period = len(search(".", some_text)) > 0;
-    spacing = has_period ? period_spacing : 1;
-    x = (some_text == "4") ? offset_four : (has_period ? -period_spacing / 3: 0);
+    overall_spacing = len(some_text) == 2 ? 1 : 1;
+    spacing = 1;
+    x = (some_text == "4") ? offset_four : (has_period ? period_spacing / 3: 0);
 
-    echo("extrude_text", some_text, has_period, spacing);
-    translate([x, vertical_offset * multiplier, -extrude_depth_override + 1])
-      linear_extrude(height = extrude_depth_override + 1)
+    translate([x, vertical_offset * multiplier, -depth + 1])
+      linear_extrude(height = depth + 1)
         text(text = some_text, size = height * multiplier * font_scale / 100, valign = "center", halign = "center", spacing = spacing, font = font);
   }
 }
@@ -66,7 +64,7 @@ module render_shape_from_stl(stl_file, offset_x, offset_y, offset_z = 0) {
 }
 
 module render_shape(num, width, height, offset_x = 0, offset_y = 0, is_crystal = -1) {
-  render_base();
+  // render_base();
 
   if (num == 3)
     render_polygon([[0, height/2], [width/2, -height/2], [-width/2, -height/2], [0, height/2]], offset_x, offset_y);
@@ -85,10 +83,14 @@ module render_shape(num, width, height, offset_x = 0, offset_y = 0, is_crystal =
     render_polygon(pentagon(width), offset_x, offset_y);
 
   module render_polygon(points, offset_x = 0, offset_y = 0) {
-    color("white")
-      translate([offset_x, offset_y, 15])
-        linear_extrude(height = 3, center = true) 
-          polygon(points = points);
+    if (generate_base_shape) {
+            polygon(points = points);
+    } else {
+      color("white")
+        translate([offset_x, offset_y, 0])
+          chamfer_extrude(height = 5, angle = 30, center = true) 
+            polygon(points = points);
+    }
   }
 }
 

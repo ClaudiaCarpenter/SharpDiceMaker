@@ -8,6 +8,11 @@ gen_die() {
   $OPENSCAD -o $DIR/$1.stl -D "which_die=\"$1\"" -p $PRESETS -P "$NAME" CrystalDiceMaker.scad
 }
 
+gen_base() {
+  printf "Rendering $DIR/$1.svg...\n"
+  $OPENSCAD -o $DIR/$1.svg -D "which_die=\"$1\"" -p $PRESETS -P "$NAME" CrystalDiceMaker.scad
+}
+
 print_error() {
   RED='\033[1;31m'
   NC='\033[0m' # No Color
@@ -53,16 +58,17 @@ mkdir $DIR 2> /dev/null
 # echo
 # echo Generating supported dice
 
-gen_die d4 $1
+# gen_die d4 $1
 gen_die d4c $1
 gen_die d6 $1
 gen_die d8 $1
-gen_die d10 $1
+# gen_die d10 $1
 gen_die d10c $1
-gen_die d100 $1
+# gen_die d100 $1
 gen_die d100c $1
 gen_die d12 $1
 gen_die d20 $1
+gen_die d20c $1
 
 end_time=$(date +%s)
 elapsed=$(( (end_time - start_time) ))

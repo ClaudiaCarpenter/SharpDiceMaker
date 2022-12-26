@@ -96,9 +96,17 @@ include <BOSL2/std.scad>
 include <BOSL2/shapes.scad>
 include <BOSL2/polyhedra.scad>
 
-module crystal(face_edge, body_length, end_height, makeHollow = false) {
-  if (!makeHollow) 
-    cuboid([face_edge, body_length, face_edge]);
+module crystal(face_edge, body_length, end_height, makeHollow = false, add_sprue, sprue_diameter = 2, sprue_angle = 0) {
+  echo("crystal", face_edge, body_length, end_height, makeHollow, add_sprue, sprue_diameter, sprue_angle);
+
+  if (!makeHollow)
+    difference() {
+      cuboid([face_edge, body_length, face_edge]);
+      if (add_sprue) {
+        echo("add_sprue", -face_edge/4, body_length/4, 0, sprue_diameter, sprue_angle);
+        make_sprue_hole(-3, sprue_on_high ? 3.5 : -3.5, sprue_on_high ? -3: 3, sprue_diameter);
+      }
+    }
 
   translate([0, -body_length / 2, 0])
     rotate([90, 90, 0]) {
@@ -119,6 +127,54 @@ module crystal(face_edge, body_length, end_height, makeHollow = false) {
       translate([0, -body_length / 2, 0])
         rotate([90, 90, 0])
           prismoid([face_edge, face_edge], [0, 0], h=end_height);
+}
+
+module trigonal_trapezohedron(face_edge, angle=33, makeHollow = false, add_sprue, sprue_diameter = 2, sprue_angle = 0) {
+  echo("trigonal_trapezohedron", face_edge, makeHollow, add_sprue, sprue_diameter, sprue_angle);
+
+  if (makeHollow)
+    difference() {
+      draw_shape();
+      translate([0, 0, -.0025])
+        draw_shape();
+    }
+  else
+   draw_shape();
+
+  module draw_shape() {
+    regular_polyhedron("trapezohedron",faces=6, d=face_edge, h=face_edge, anchor=BOTTOM);
+  }
+
+}
+
+//------------------------------------------------------------------------------------
+//                                    SPRUE
+//------------------------------------------------------------------------------------
+
+module make_sprue_hole(x_offset, y_offset, z_offset, diameter, angle = 0, height = 8) {
+  echo("make_sprue_hole", x_offset, y_offset, z_offset, diameter, angle, height);
+  color("blue")
+    translate([x_offset, y_offset, z_offset])
+      rotate([angle, 0, 0])
+        cylinder(h = height, r1 = diameter * 0.5, r2 = diameter * 0.5, center = true, $fn = diameter * 25);
+}
+
+module generate_sprue(hole_diameter) {
+  height_tip = 2;
+  height_trans = 20;
+  height_body = 6;
+  width_body = hole_diameter / 2 * 3;
+
+  scale([0.95, 0.95, 1]) { // wiggle room
+    translate([0, 0, height_body + height_trans])
+      cylinder(h = height_tip, r1 = hole_diameter * 0.5, r2 = hole_diameter * 0.5, center = false, $fn = hole_diameter * 25);
+
+    translate([0, 0, height_body])
+      cylinder(h = height_trans, r1 = width_body, r2 = hole_diameter * 0.5, center = false, $fn = hole_diameter * 25);
+
+    translate([0, 0, 0])
+      cylinder(h = height_body, r1 = width_body, r2 = width_body, center = false, $fn = hole_diameter * 25);
+  }
 }
 
 //------------------------------------------------------------------------------------
@@ -152,12 +208,10 @@ support_color = "LightSlateGray";
 
 module render_supports(width, height, support_offset, num = 3) {
   rotate_by = 360 / num;
-  
-  if (supports_raft)
-    render_raft(width, support_offset, num);
 
   depth = .1;
-  num_steps = support_offset * 2;
+  num_steps = 5;
+  steps_height = support_offset / num_steps;
 
   color("white") 
     for (i = [0 : num])
@@ -167,10 +221,9 @@ module render_supports(width, height, support_offset, num = 3) {
 
   for (i = [0 : num])
     rotate([0, 0, i * rotate_by]) {
-      for (j = [3 : num_steps])
-        translate([-depth, 0, -j])
-          color(support_color, 1 - j / num_steps)
-            render_support(width + depth, height + depth, supports_connecting_width*(j+1), support_offset);
+      for (j = [1 : num_steps])
+        translate([0, 0, -1])
+          render_support(width, height-j, supports_connecting_width*(j+1), support_offset - j * .5);
     }      
 }
 

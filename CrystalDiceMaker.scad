@@ -1,16 +1,16 @@
-////------------------------------------------
+//////------------------------------------------
 // Dnd Crystal Dice 3D Maker
 //------------------------------------------
 
 /* [Which Die] */
 
 // ^ render one die at a time => use d100 for d%
-which_die = "d20"; //  ["d4","d4c","d6","d8","d10","d10c","d100","d100c","d12","d20"]
+which_die = "d20"; //  ["d4","d4c","d6","d8","d10","d10c","d100","d100c","d12","d20","d20c"]
 
 /* [Text Options] */
 
 // ^ use Help > Font List > click > Copy to Clipboard
-font = "Kingthings Petrock:style=Regular"; // ["PetRock\\-Dice:style=Regular","Kingthings Petrock:style=Regular", "Antraxja  Goth 1938:style=Regular","Amita:style=Regular","Argos MF:style=Regular","Bloody Stump:style=Regular","Boismen:style=Light","Cardosan:style=Regular","Caslon Antique:style=Regular","C[0, 180, 60]aslonishFraxx:style=Regular","Celtic Garamond the 2nd:style=Regular","Demons and Darlings:style=Regular","Linotype Didot:style=Bold","Dice\\-Digits:style=Regular", "Donree's Claws:style=Regular","Dumbledor 2:style=Regular","Dunbar Tall:style=Regular","Dungeon:style=Regular","Dice\\-Digits:style=Regular","Dragon Fire:style=Regular","Fanjofey AH:style=Regular","First Order Condensed:style=Condensed","Gothic\\-Numbers:style=Regular","Grusskarten Gotisch:style=Regular","Hobbiton:style=Regular","Hobbiton Brushhand:style=Hobbiton brush","Huggles:style=Regular","Kabinett Fraktur:style=Regular","KG Lego House:style=Regular","Klarissa:style=Regular","Lycanthrope:style=Regular","Manuskript Gothisch:style=Regular","Midjungards:style=Italic","Night Mare:style=Regular","October Crow:style=Regular","Old London:style=Regular","PerryGothic:style=Regular","Poppl Fraktur CAT:style=Regular","Pretty\\-Numbers:style=Regular","Rane Insular:style=Regular","Redressed:style=Regular","RhymeChronicle1494:style=not included.","Austie Bost Simple Simon:style=Regular","Spooky Pumpkin regular:style=Regular","Spooky Skeleton:style=Regular","Tencele Latinwa:style=Regular","Unquiet Spirits:style=Regular","White Storm:style=Regular","XalTerion:style=Regular"]
+font = "petrock-thinner"; // ["petrock-thinner","PetRock\\-Dice:style=Regular","Kingthings Petrock:style=Regular", "Antraxja  Goth 1938:style=Regular","Amita:style=Regular","Argos MF:style=Regular","Bloody Stump:style=Regular","Boismen:style=Light","Cardosan:style=Regular","Caslon Antique:style=Regular","C[0, 180, 60]aslonishFraxx:style=Regular","Celtic Garamond the 2nd:style=Regular","Demons and Darlings:style=Regular","Linotype Didot:style=Bold","Dice\\-Digits:style=Regular", "Donree's Claws:style=Regular","Dumbledor 2:style=Regular","Dunbar Tall:style=Regular","Dungeon:style=Regular","Dice\\-Digits:style=Regular","Dragon Fire:style=Regular","Fanjofey AH:style=Regular","First Order Condensed:style=Condensed","Gothic\\-Numbers:style=Regular","Grusskarten Gotisch:style=Regular","Hobbiton:style=Regular","Hobbiton Brushhand:style=Hobbiton brush","Huggles:style=Regular","Kabinett Fraktur:style=Regular","KG Lego House:style=Regular","Klarissa:style=Regular","Lycanthrope:style=Regular","Manuskript Gothisch:style=Regular","Midjungards:style=Italic","Night Mare:style=Regular","October Crow:style=Regular","Old London:style=Regular","PerryGothic:style=Regular","Poppl Fraktur CAT:style=Regular","Pretty\\-Numbers:style=Regular","Rane Insular:style=Regular","Redressed:style=Regular","RhymeChronicle1494:style=not included.","Austie Bost Simple Simon:style=Regular","Spooky Pumpkin regular:style=Regular","Spooky Skeleton:style=Regular","Tencele Latinwa:style=Regular","Unquiet Spirits:style=Regular","White Storm:style=Regular","XalTerion:style=Regular"]
 // ^ true to draw the numbers, false to make blank faces
 draw_text = true;
 // ^ tweak until the 4 looks right
@@ -49,6 +49,9 @@ d12_vertical_offset = 0; // [-5.0:0.1:5.0]
 d20_height = 28; // [5:0.1:100]
 d20_font_scale = 100;
 d20_vertical_offset = 0; // [-5.0:0.1:5.0]
+d20c_height = 38; // [5:0.1:100]
+d20c_font_scale = 100;
+d20c_vertical_offset = 0; // [-5.0:0.1:5.0]
 
 /* [D20] */
   
@@ -61,7 +64,7 @@ d20_svg_file = "svg/scull_crossbones.svg";
 /* [Wall Supports] */
 
 // ^ height in mm for wall supports (0 for none)
-supports_height = 3; // [0:10]
+supports_height = 3; // [0:15]
 // ^ render the supports, despite the height
 draw_supports = true;
 // ^ check to have a wider base for your supports
@@ -69,7 +72,9 @@ supports_raft = true;
 // ^ height in mm
 supports_raft_height = 1;
 // ^ size in mm for wall supports connector
-supports_connecting_width = 0.2; // [0.2:0.1:1]
+supports_connecting_width = 0.3; // [0.2:0.1:1]
+
+make_face_text_deeper = false;
 
 /* [Normally Hidden] */
 show_bounding_box = false;
@@ -78,6 +83,13 @@ show_bounding_box = false;
 see_supports = false;
 
 generate_base = false;
+generate_base_shape = false;
+add_sprue_hole = true;
+sprue_on_high = true;
+sprue_diameter = 2;
+skip_high_number = false;
+skip_low_number = false;
+skip_sprue_numbers = true;
 
 trim_underneath = true;
 
@@ -94,10 +106,11 @@ d10_face_edge = d10_height * 0.68;
 d10c_face_edge = d10c_height * 0.5;
 d12_face_edge  = d12_height * 0.5597;
 d20_face_edge  = d20_height * 0.5062;
+d20c_face_edge  = d20c_height * 0.5062;
 
 module drawWhich(which="d4") {
-    echo("\ndrawWhich\n", which);
-  difference() {
+  echo(supports_height);
+ difference() {
     if (which=="d4")    draw_d4(d4_face_edge,     d4_font_scale,    d4_vertical_offset, false);
     if (which=="d4c")   draw_d4(d4c_face_edge,    d4c_font_scale,   d4c_vertical_offset, true);
     if (which=="d6")    draw_d6(d6_face_edge,     d6_font_scale,    d6_vertical_offset);
@@ -108,10 +121,11 @@ module drawWhich(which="d4") {
     if (which=="d100c") draw_d10(d10c_face_edge,  d10c_font_scale,  d10c_vertical_offset, true, true);
     if (which=="d12")   draw_d12(d12_face_edge,   d12_font_scale,   d12_vertical_offset);
     if (which=="d20")   draw_d20(d20_face_edge,   d20_font_scale,   d20_vertical_offset);
+    if (which=="d20c")   draw_d20(d20c_face_edge,   d20c_font_scale,   d20c_vertical_offset);
 
     if (trim_underneath) // cuts off anything below z=0
       translate([0, 0, -5])
-        cylinder(h=10, r1=d20_face_edge, r2=d20_face_edge, center = true);
+        cylinder(h=10, r1=d20c_face_edge, r2=d20c_face_edge, center = true);
   }
 }
 
