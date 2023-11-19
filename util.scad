@@ -11,39 +11,68 @@ module render_svg(svg_file, svg_rotation, svg_scale, svg_offset, do_draw_text = 
   }
 
   module extrude_it() {
-    // echo("rendering", svg_file);
+    echo("rendering", svg_file);
     translate([0, svg_offset, -extrude_depth + 1])
       rotate([0, 0, svg_rotation])
         scale([svg_scale, svg_scale, 1])
           linear_extrude(height = extrude_depth + 1)
             import(svg_file, center = true);
-      // echo("rendered", svg_file);
+    echo("rendered", svg_file);
   }
 }
 
+// concatenate multiple strings
+function join( arr, sp="", _ret="", _i=0)= (
+  _i<len(arr)?
+      join( arr, sp=sp
+          , _ret= str(_ret,_i==0?"":sp,arr[_i])
+          , _i=_i+1 )
+  :_ret
+);
+
 module extrude_text(some_text, font_scale, vertical_offset, height, multiplier, do_draw_text, offset_four, extrude_multiplier = 1) {
-  if (do_draw_text) {
-    if (show_bounding_box) {
-      extrude_it();
-      %bounding_box() extrude_it();
-    } else
-      extrude_it();
-  } else echo("Skipping text");
+  if (svg_overlay) {
+    render_svg(svg_overlay, 0, 1, svg_path_offset, do_draw_text);
+  }
+
+  if (svg_path) {
+    extension = len(search(".", some_text)) == 0 ? ".svg" : "svg";
+    svg_file = join([svg_path, "/", some_text, extension]);
+    render_svg(svg_file, 0, 1, svg_path_offset, do_draw_text);
+  } else {
+    if (do_draw_text) {
+      if (show_bounding_box) {
+        extrude_it();
+        %bounding_box() extrude_it();
+      } else
+        extrude_it();
+    } else echo("Skipping text");
+  }
 
   module extrude_it() {
     depth = make_face_text_deeper ? extrude_depth * extrude_multiplier : extrude_depth;
     size = height * multiplier * font_scale / 100;
     has_period = len(search(".", some_text)) > 0;
-    overall_spacing = len(some_text) == 2 ? 1 : 1;
-    spacing = 1;
-    x = (some_text == "4") ? offset_four : (has_period ? period_spacing / 3: 0);
+    two_digits = len(some_text) == 2 && !has_period;
+    is_twenty = some_text == "20";
+    spacing = two_digits && !has_period && !is_twenty? double_digit_spacing : two_digits && is_twenty ? double_digit_spacing_20 : 1;
 
+    x = (some_text == "4") ? offset_four : (has_period ? period_spacing / 3: (two_digits ? 2*(spacing - 1) : 0));
+
+    // echo("rendering text: ", some_text, size, height, multiplier);
     translate([x, vertical_offset * multiplier, -depth + 1])
       linear_extrude(height = depth + 1)
-        text(text = some_text, size = height * multiplier * font_scale / 100, valign = "center", halign = "center", spacing = spacing, font = font);
+        text(text = some_text, size = size, valign = "center", halign = "center", spacing = spacing, font = font);
   }
 }
 
+module add_face_border() {
+  linear_extrude(5, convexity = 2)
+    difference() {
+        pHeart(xy = 78, off = 2);
+        pHeart(xy = 78, off = 0.4);
+    }
+}
 //------------------------------------------------------------------------------------
 //                              Bases
 //------------------------------------------------------------------------------------

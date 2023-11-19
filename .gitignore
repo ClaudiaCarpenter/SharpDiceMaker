@@ -3,8 +3,12 @@ playground.scad
 *.chitubox
 *.old
 *.tmp
+*.ctb
 
 Poly*
 dice5.1.scad
 
 /inspiration
+/stash
+
+

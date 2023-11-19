@@ -1,4 +1,5 @@
 module dodecahedron(height, slope, cutoff) {
+  echo(height, slope, cutoff);
     intersection() {
         // Make a cube
         cube([2 * height, 2 * height, cutoff * height], center = true); 
@@ -29,7 +30,7 @@ module deltohedron(height, angle) {
     }
 }
 
-module octahedron(height) {
+module octahedron(height) { 
     intersection() {
         // Make a cube
         cube([2 * height, 2 * height, height], center = true); 
@@ -146,6 +147,7 @@ module trigonal_trapezohedron(face_edge, angle=33, makeHollow = false, add_sprue
   }
 
 }
+
 
 //------------------------------------------------------------------------------------
 //                                    SPRUE
