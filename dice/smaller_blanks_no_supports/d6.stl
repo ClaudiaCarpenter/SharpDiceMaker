@@ -1,0 +1,86 @@
+solid OpenSCAD_Model
+  facet normal 0 0 -1
+    outer loop
+      vertex -4.575 -4.575 6.34913
+      vertex 4.575 4.575 6.34913
+      vertex 4.575 -4.575 6.34913
+    endloop
+  endfacet
+  facet normal -0 0 -1
+    outer loop
+      vertex 4.575 4.575 6.34913
+      vertex -4.575 -4.575 6.34913
+      vertex -4.575 4.575 6.34913
+    endloop
+  endfacet
+  facet normal -1 0 0
+    outer loop
+      vertex -4.575 -4.575 6.34913
+      vertex -4.575 4.575 15.4991
+      vertex -4.575 4.575 6.34913
+    endloop
+  endfacet
+  facet normal -1 -0 0
+    outer loop
+      vertex -4.575 4.575 15.4991
+      vertex -4.575 -4.575 6.34913
+      vertex -4.575 -4.575 15.4991
+    endloop
+  endfacet
+  facet normal -0 0 1
+    outer loop
+      vertex -4.575 4.575 15.4991
+      vertex 4.575 -4.575 15.4991
+      vertex 4.575 4.575 15.4991
+    endloop
+  endfacet
+  facet normal 0 0 1
+    outer loop
+      vertex 4.575 -4.575 15.4991
+      vertex -4.575 4.575 15.4991
+      vertex -4.575 -4.575 15.4991
+    endloop
+  endfacet
+  facet normal 0 1 -0
+    outer loop
+      vertex 4.575 4.575 6.34913
+      vertex -4.575 4.575 15.4991
+      vertex 4.575 4.575 15.4991
+    endloop
+  endfacet
+  facet normal 0 1 0
+    outer loop
+      vertex -4.575 4.575 15.4991
+      vertex 4.575 4.575 6.34913
+      vertex -4.575 4.575 6.34913
+    endloop
+  endfacet
+  facet normal 1 -0 0
+    outer loop
+      vertex 4.575 -4.575 15.4991
+      vertex 4.575 4.575 6.34913
+      vertex 4.575 4.575 15.4991
+    endloop
+  endfacet
+  facet normal 1 0 0
+    outer loop
+      vertex 4.575 4.575 6.34913
+      vertex 4.575 -4.575 15.4991
+      vertex 4.575 -4.575 6.34913
+    endloop
+  endfacet
+  facet normal 0 -1 0
+    outer loop
+      vertex -4.575 -4.575 6.34913
+      vertex 4.575 -4.575 15.4991
+      vertex -4.575 -4.575 15.4991
+    endloop
+  endfacet
+  facet normal 0 -1 -0
+    outer loop
+      vertex 4.575 -4.575 15.4991
+      vertex -4.575 -4.575 6.34913
+      vertex 4.575 -4.575 6.34913
+    endloop
+  endfacet
+endsolid OpenSCAD_Model

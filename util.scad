@@ -1,3 +1,5 @@
+include <scad-utils/morphology.scad>
+
 //------------------------------------------------------------------------------------
 //                               Text / Image Utils
 //------------------------------------------------------------------------------------
@@ -43,8 +45,9 @@ module extrude_text(some_text, font_scale, vertical_offset, height, multiplier, 
     if (do_draw_text) {
       if (show_bounding_box) {
         extrude_it();
-        %bounding_box() extrude_it();
-      } else
+        %bounding_box() 
+          extrude_it();
+       } else
         extrude_it();
     } else echo("Skipping text");
   }
@@ -59,10 +62,10 @@ module extrude_text(some_text, font_scale, vertical_offset, height, multiplier, 
 
     x = (some_text == "4") ? offset_four : (has_period ? period_spacing / 3: (two_digits ? 2*(spacing - 1) : 0));
 
-    // echo("rendering text: ", some_text, size, height, multiplier);
+    echo("rendering text: ", some_text, size, height, multiplier);
     translate([x, vertical_offset * multiplier, -depth + 1])
-      linear_extrude(height = depth + 1)
-        text(text = some_text, size = size, valign = "center", halign = "center", spacing = spacing, font = font);
+      linear_extrude(height = depth + 1, $fn=extrude_quality)
+        text(text = some_text, size = size, valign = "center", halign = "center", spacing = spacing, font = font);    
   }
 }
 
@@ -73,6 +76,38 @@ module add_face_border() {
         pHeart(xy = 78, off = 0.4);
     }
 }
+
+module rounded_extrude() { 
+    // a 3D approx. of the children projection on X axis 
+    module xProjection() 
+        translate([0,1/2,-1/2]) 
+            linear_extrude(1) 
+                hull() 
+                    projection() 
+                        rotate([90,0,0]) 
+                            linear_extrude(1) 
+                                projection() children(); 
+  
+    // a bounding box with an offset of 1 in all axis
+    module bbx()  
+        minkowski() { 
+            xProjection() children(); // x axis
+            rotate(-90)               // y axis
+                xProjection() rotate(90) children(); 
+            rotate([0,-90,0])         // z axis
+                xProjection() rotate([0,90,0]) children(); 
+        } 
+    
+    // offset children() (a cube) by -1 in all axis
+    module shrink()
+      intersection() {
+        translate([ 1, 1, 1]) children();
+        translate([-1,-1,-1]) children();
+      }
+
+   shrink() bbx() children(); 
+}
+
 //------------------------------------------------------------------------------------
 //                              Bases
 //------------------------------------------------------------------------------------

@@ -72,7 +72,7 @@ module draw_d4(face_edge, font_scale, vertical_offset, is_crystal) {
 					tetrahedron(d4_face_edge);
 					if (cut_corners)
 						rotate([ 0, 180, 0 ])
-					tetrahedron(d4_face_edge * 3 * 0.85);
+					    tetrahedron(d4_face_edge * 3 * 0.85);
 				}
 
 				if (draw_text)
@@ -118,17 +118,16 @@ module draw_d4(face_edge, font_scale, vertical_offset, is_crystal) {
 		d4_body_width = d4_body_length * .8;
 
 		z_translation = !generate_base ? die_height / 2 + supports_height : 1.55 * die_height;
-		point_down_if_printing = draw_supports ? [ 90, 0, 0 ] : [ 0, 0, 0 ];
+		point_down_if_printing = point_down || draw_supports ? [ 90, 0, 0 ] : [ 0, 0, 0 ];
 
 		if (generate_base) {
 			render_shape(4, d4_body_width - 3, d4_body_length - 3, 0, 0);
 		} else {
 			translate([ 0, 0, z_translation ])
-			rotate(point_down_if_printing)
-			{
+			rotate(point_down_if_printing) {
 				difference() {
 					crystal(d4_body_width, d4_body_length, pointy_end_height, see_supports, add_sprue = add_sprue_hole);
-					draw_text(d4_body_width);
+						draw_text(d4_body_width);
 				}
 			}
 
@@ -141,10 +140,9 @@ module draw_d4(face_edge, font_scale, vertical_offset, is_crystal) {
 		}
 
 		module draw_text(height) {
-			// echo("\ndraw_text\n", height);
 			digits = [ "3", "4", "2", "1" ];
 			height_multiplier = 0.75;
-			y_offset = 0;
+			y_offset = 0;	
 			top_digit = "4";
 
 			for (i = [0:3]) {
@@ -209,7 +207,7 @@ module draw_d6(face_edge, font_scale, vertical_offset) {
 
 					if (cut_corners)
 						rotate([ 125, 0, 45 ])
-					octahedron(face_edge * 1.625);
+					    octahedron(face_edge * 1.65);
 				}
 
 				draw_d6_text(face_edge, draw_text);
@@ -305,7 +303,7 @@ module draw_d8(face_edge, font_scale, vertical_offset) {
 	}
 
 	module draw_tipped_shape() {
-		point_down_if_printing = draw_supports ? [ -54.7355, 0, 0 ] : [ 0, 0, 0 ];
+		point_down_if_printing = point_down || draw_supports ? [ -54.7355, 0, 0 ] : [ 0, 0, 0 ];
 		rotate(point_down_if_printing)
 		{
 			difference() {
@@ -384,7 +382,7 @@ module draw_d10(face_edge, font_scale, vertical_offset, is_percentile, is_crysta
 
 	z_multiplier = is_crystal ? 1 : 0.74724;
 	z_translation = !generate_base ? face_edge * z_multiplier + supports_height : 23;
-	point_down_if_printing = draw_supports ? [ 312, 0, 0 ] : [ 12, 0, 0 ];
+	point_down_if_printing = point_down || draw_supports ? [ 312, 0, 0 ] : [ 12, 0, 0 ];
 	angle = is_crystal ? 120 : 132;
 	high_digit = add_sprue_hole ? (sprue_on_high ? "100" : "1") : -1;
 
@@ -528,7 +526,7 @@ module draw_d12(face_edge, font_scale, vertical_offset) {
 	height_multiplier = .32;
 	face_height = face_edge * 1.42;
 	z_translation = !generate_base ? face_edge * 0.89347 + supports_height : 17;
-	point_down_if_printing = draw_supports ? [ -37.3775, 0, 0 ] : [ 0, 0, 0 ];
+	point_down_if_printing = point_down || draw_supports ? [ -37.3775, 0, 0 ] : [ 0, 0, 0 ];
 
 	if (generate_base) {
 		render_shape(5, face_edge / 2 - 1, 0, 0);
@@ -562,7 +560,7 @@ module draw_d12(face_edge, font_scale, vertical_offset) {
 
 					if (cut_corners)
 						rotate([ 35, 10, -18 ])
-					icosahedron(face_height * 1.218);
+					    icosahedron(face_height * 1.218);
 				}
 
 				draw_d12_text(face_height, 116.565, height_multiplier, draw_text);
@@ -594,7 +592,7 @@ module draw_d20(face_edge, font_scale, vertical_offset) {
 
 	z_translation = draw_supports ? face_edge * 0.9878 + supports_height : face_edge;
 	face_height = face_edge * 1.56995960338;
-	point_down_if_printing = [ 35.264, 13.285, 18 ]; // draw_supports  ? [35.264, 13.285, 18] : [0, 0, 0];
+	point_down_if_printing = draw_supports  ? [35.264, 13.285, 18] : [0, 0, 0];
 	is_chonk = face_edge > 16;
 
 	if (generate_base) {
@@ -629,7 +627,7 @@ module draw_d20(face_edge, font_scale, vertical_offset) {
 
 					if (cut_corners)
 						rotate([ -10, 35, -28 ])
-					dodecahedron(face_height * 1.2, 116.565, 1);
+					    dodecahedron(face_height * 1.2, 116.565, 1);
 				}
 				draw_d20_text(face_height, draw_text);
 			}

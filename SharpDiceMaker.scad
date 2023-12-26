@@ -21,12 +21,12 @@ extrude_depth = 1;
 // ^ render one die at a time => use d100 for d%
 which_die = "d20"; //  ["d4","d6","d8","d10","d100","d12","d20"]
 
-d4_height = 34;
-d6_height  = 16;
-d8_height  = 26;
-d10_height = 30;
+height_d4 = 34;
+height_d6  = 16;
+height_d8  = 26;
+height_d10 = 30;
 d12_height  = 23;
-d20_height  = 28;
+height_d20  = 28;
 
 /* [D20] */
 
@@ -61,12 +61,12 @@ d10_ratio = 2;
 d12_ratio = 1.8;
 d20_ratio = 2;
 
-d4_face_edge = d4_height / 2.85;
-d6_face_edge  = d6_height / 1;
-d8_face_edge  = d8_height / 1.4;
-d10_face_edge = d10_height / 2;
+d4_face_edge = height_d4 / 2.85;
+d6_face_edge  = height_d6 / 1;
+d8_face_edge  = height_d8 / 1.4;
+d10_face_edge = height_d10 / 2;
 d12_face_edge  = d12_height / 1.8;
-d20_face_edge  = d20_height / 2;
+d20_face_edge  = height_d20 / 2;
 
 include <shapes.scad>
 include <faces.scad>
