@@ -195,23 +195,25 @@ base_height = 2;
 support_color = "LightSlateGray";
 
 module render_supports(width, height, support_offset, num = 3) {
+	echo("Supports", width, height, supports_height, num);
 	rotate_by = 360 / num;
 
 	depth = .1;
 	num_steps = 5;
 	steps_height = support_offset / num_steps;
 
-	color("white") for (i = [0:num]) rotate([ 0, 0, i * rotate_by ])
-	translate([ -depth, 0, 0 ])
-	render_support(width + depth, height + depth, supports_connecting_width, support_offset);
+	color(support_color) 
+		for (i = [0:num]) rotate([ 0, 0, i * rotate_by ])
+			translate([ -depth, 0, 0 ])
+				render_support(width + depth, height + depth, supports_connecting_width, support_offset);
 
 	for (i = [0:num])
 		rotate([ 0, 0, i * rotate_by ])
-	{
-		for (j = [1:num_steps])
-			translate([ 0, 0, -1 ])
-		render_support(width, height - j, supports_connecting_width * (j + 1), support_offset - j * .5);
-	}
+		{
+			for (j = [1:num_steps])
+				translate([ 0, 0, -1 ])
+			render_support(width, height - j, supports_connecting_width * (j + 1), support_offset - j * .5);
+		}
 }
 
 //------------------------------------------------------------------------------------
@@ -224,6 +226,8 @@ module render_support(length, height, depth, support_offset = 0) {
 		[ midpoint, height + support_offset ], // upper right
 		[ midpoint, 0 ]                        // lower right
 	];
+
+	echo("Support", triangle_points);
 
 	rotate([ 90, 0, 0 ])
 	linear_extrude(height = depth, center = true) polygon(points = triangle_points);

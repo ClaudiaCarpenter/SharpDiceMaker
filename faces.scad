@@ -34,9 +34,9 @@ module draw_d2(diameter, font_scale, vertical_offset) {
 //                                       D4
 //------------------------------------------------------------------------------------
 
-module draw_d4(face_edge, font_scale, vertical_offset, is_crystal) {
+module draw_d4(face_edge, font_scale, vertical_offset, style) {
 
-	if (is_crystal)
+	if (style == "crystal" || style == "chub")
 		draw_d4c(face_edge);
 	else
 		draw_d4t(face_edge);
@@ -113,11 +113,13 @@ module draw_d4(face_edge, font_scale, vertical_offset, is_crystal) {
 	}
 
 	module draw_d4c(die_height) {
-		pointy_end_height = die_height * .27;
-		d4_body_length = die_height - 2 * pointy_end_height;
-		d4_body_width = d4_body_length * .8;
+		height_to_use = style == "chub" ? die_height *.8 : die_height;
+		pointy_end_height = height_to_use * (style == "chub" ? .18: .25);
+		body_length = height_to_use - 2 * pointy_end_height;
+		d4_body_width = body_length * (style == "chub" ? 1 : .8);
+		d4_body_length = style == "chub"? d4_body_width: body_length;
 
-		z_translation = !generate_base ? die_height / 2 + supports_height : 1.55 * die_height;
+		z_translation = height_to_use / 2 + supports_height;
 		point_down_if_printing = point_down || draw_supports ? [ 90, 0, 0 ] : [ 0, 0, 0 ];
 
 		if (generate_base) {
@@ -141,7 +143,7 @@ module draw_d4(face_edge, font_scale, vertical_offset, is_crystal) {
 
 		module draw_text(height) {
 			digits = [ "3", "4", "2", "1" ];
-			height_multiplier = 0.75;
+			height_multiplier = style == "chub"? 0.6: 0.75;
 			y_offset = 0;	
 			top_digit = "4";
 
@@ -375,11 +377,12 @@ module draw_d8(face_edge, font_scale, vertical_offset) {
 //------------------------------------------------------------------------------------
 //                                     D10/D%
 //------------------------------------------------------------------------------------
-module draw_d10(face_edge, font_scale, vertical_offset, is_percentile, is_crystal) {
+module draw_d10(face_edge, font_scale, vertical_offset, is_percentile, style) {
 
 	digits = is_percentile ? [ "50", "40", "10", "80", "70", "20", "90", "00", "30", "60" ]
 	                       : [ "5", "4", "1", "8", "7", "2", "9.", "0", "3", "6." ];
-
+echo(style);
+	is_crystal = style == "crystal";
 	z_multiplier = is_crystal ? 1 : 0.74724;
 	z_translation = !generate_base ? face_edge * z_multiplier + supports_height : 23;
 	point_down_if_printing = point_down || draw_supports ? [ 312, 0, 0 ] : [ 12, 0, 0 ];
@@ -592,7 +595,7 @@ module draw_d20(face_edge, font_scale, vertical_offset) {
 
 	z_translation = draw_supports ? face_edge * 0.9878 + supports_height : face_edge;
 	face_height = face_edge * 1.56995960338;
-	point_down_if_printing = draw_supports  ? [35.264, 13.285, 18] : [0, 0, 0];
+	point_down_if_printing = true  ? [35.264, 13.285, 18] : [0, 0, 0];
 	is_chonk = face_edge > 16;
 
 	if (generate_base) {
