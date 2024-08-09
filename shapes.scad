@@ -195,25 +195,35 @@ base_height = 2;
 support_color = "LightSlateGray";
 
 module render_supports(width, height, support_offset, num = 3) {
-	echo("Supports", width, height, supports_height, num);
-	rotate_by = 360 / num;
+//	echo("Supports", width, height, supports_height, num);
 
-	depth = .1;
-	num_steps = 5;
-	steps_height = support_offset / num_steps;
+	module doit() {
+		depth = .1;
+		num_steps = 5;
+		rotate_by = 360 / num;
+		steps_height = support_offset / num_steps;
 
-	color(support_color) 
-		for (i = [0:num]) rotate([ 0, 0, i * rotate_by ])
-			translate([ -depth, 0, 0 ])
-				render_support(width + depth, height + depth, supports_connecting_width, support_offset);
+		color("white") 
+			for (i = [0:num]) 
+				rotate([ 0, 0, i * rotate_by ])
+					translate([ -depth, 0, 0 ])
+						render_support(width + depth, height + depth, supports_connecting_width, support_offset);
+						// render_ventilated_support(width + depth, height + depth, supports_connecting_width, support_offset, depth);
 
-	for (i = [0:num])
-		rotate([ 0, 0, i * rotate_by ])
-		{
+		for (i = [0:num])
+			rotate([ 0, 0, i * rotate_by ]) {
 			for (j = [1:num_steps])
 				translate([ 0, 0, -1 ])
-			render_support(width, height - j, supports_connecting_width * (j + 1), support_offset - j * .5);
+					render_support(width, height - j, supports_connecting_width * (j + 1), support_offset - j * .5);
 		}
+
+	}
+	doit();
+	*difference() {
+		doit();
+        cylinder(h=12, r=.5, center = true, $fn=100);
+	}
+	echo(supports_connecting_width*6);
 }
 
 //------------------------------------------------------------------------------------
@@ -227,10 +237,40 @@ module render_support(length, height, depth, support_offset = 0) {
 		[ midpoint, 0 ]                        // lower right
 	];
 
-	echo("Support", triangle_points);
+	//echo("Support", triangle_points);
 
 	rotate([ 90, 0, 0 ])
-	linear_extrude(height = depth, center = true) polygon(points = triangle_points);
+		linear_extrude(height = depth, center = true) 
+			polygon(points = triangle_points);
+}
+
+//------------------------------------------------------------------------------------
+module render_ventilated_support(length, height, depth, support_offset, tweak_offset) {
+	midpoint = triangle_midpoint(length);
+
+	triangle_points = [
+		[ 0, 0 ],                              // lower left
+		[ 0, support_offset ],                 // upper left
+		[ midpoint, height + support_offset ], // upper right
+		[ midpoint, 0 ]                        // lower right
+	];
+
+	rotate([ 90, 0, 0 ]) {
+		difference() {	
+			linear_extrude(height = depth, center = true) 
+				polygon(points = triangle_points);
+    
+            tlen = sqrt(length*length + height*height);
+			num = tlen * 25 / 50;
+			dx = midpoint / num;
+			dy = height / num;
+    
+			for (i = [0:num]) {
+             	translate([i*dx, support_offset+i*dy-tweak_offset, 0 ])
+                	cylinder(5, r=.35, center = true, $fn=50);
+			}
+		}
+	}
 }
 
 module render_raft(length, support_offset, num) {

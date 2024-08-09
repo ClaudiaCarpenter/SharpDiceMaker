@@ -58,6 +58,7 @@ mkdir $DIR 2> /dev/null
 # echo
 # echo Generating supported dice
 
+# gen_die d2 $1
 # gen_die d4 $1
 gen_die d4c $1
 gen_die d6 $1

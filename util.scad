@@ -1,11 +1,9 @@
-include <scad-utils/morphology.scad>
-
 //------------------------------------------------------------------------------------
 //                               Text / Image Utils
 //------------------------------------------------------------------------------------
-module render_svg(svg_file, svg_rotation, svg_scale, svg_offset, do_draw_text = true) {
- if (do_draw_text) {
-     if (show_bounding_box) {
+module render_svg(svg_file, svg_rotation, svg_scale, svg_offset, do_draw_svg = true, depth = svg_extrude_depth) {
+ if (do_draw_svg) {
+     if (draw_bounding_box) {
       extrude_it();
       %bounding_box() extrude_it();
     } else 
@@ -13,17 +11,34 @@ module render_svg(svg_file, svg_rotation, svg_scale, svg_offset, do_draw_text = 
   }
 
   module extrude_it() {
-    echo("rendering", svg_file);
-    translate([0, svg_offset, -extrude_depth + 1])
+    echo("render_svg", svg_file=svg_file, svg_offset=svg_offset, svg_rotation=svg_rotation, svg_scale=svg_scale, depth=depth);
+    translate([0, svg_offset, -depth + 1])
       rotate([0, 0, svg_rotation])
         scale([svg_scale, svg_scale, 1])
-          linear_extrude(height = extrude_depth + 1)
+          linear_extrude(height = depth + 1)
             import(svg_file, center = true);
-    echo("rendered", svg_file);
   }
 }
 
-// concatenate multiple strings
+module render_stl(stl_file, stl_rotation, stl_scale, stl_offset, do_draw_stl = true, depth = stl_extrude_depth) {
+ if (do_draw_stl) {
+     if (draw_bounding_box) {
+      extrude_it();
+      %bounding_box() extrude_it();
+    } else 
+      extrude_it();
+  }
+
+  module extrude_it() {
+    echo("render_stl", stl_file=stl_file, stl_offset=stl_offset, stl_rotation=stl_rotation, stl_scale=stl_scale, depth=depth);
+    translate([0, stl_offset, -depth + 1])
+      rotate([0, 0, stl_rotation])
+        scale([stl_scale, stl_scale, stl_scale])
+          linear_extrude(height = depth + 1)
+            import(stl_file, center = true);
+  }
+}
+
 function join( arr, sp="", _ret="", _i=0)= (
   _i<len(arr)?
       join( arr, sp=sp
@@ -32,15 +47,58 @@ function join( arr, sp="", _ret="", _i=0)= (
   :_ret
 );
 
-module extrude_text(some_text, font_scale, vertical_offset, height, multiplier, do_draw_text, offset_four, extrude_multiplier = 1) {
+module render_text(some_text, font_scale, vertical_offset, height, multiplier, do_draw_text, 
+offset_four, extrude_multiplier) {
+  if (draw_bounding_box) {
+    extrude_it();
+    %bounding_box() 
+      extrude_it();
+    } else
+      extrude_it();
+
+    module extrude_it() {
+      *echo("render_text", some_text=some_text, font_scale=font_scale, vertical_offset=vertical_offset, height=height, 
+            multiplier=multiplier, do_draw_text=do_draw_text, offset_four=offset_four, extrude_multiplier=extrude_multiplier);
+      depth = make_face_text_deeper ? text_extrude_depth * extrude_multiplier : text_extrude_depth;
+      size = height * multiplier * font_scale / 100;
+      has_period = len(search(".", some_text)) > 0;
+      two_digits = len(some_text) == 2 && !has_period;
+      is_twenty = some_text == "20";
+      spacing = two_digits && !has_period && !is_twenty? double_digit_spacing : two_digits && is_twenty ? double_digit_spacing_20 : 1;
+
+      x = (some_text == "4") ? offset_four : (has_period ? period_spacing / 3: (two_digits ? 2*(spacing - 1) : 0));
+
+  //    echo("rendering text: ", some_text, size, height, multiplier);
+      translate([x, vertical_offset * multiplier, -depth + 1])
+        linear_extrude(height = depth + 1, $fn=extrude_quality)
+          text(text = some_text, size = size, valign = "center", halign = "center", spacing = spacing, font = font);    
+    }
+}
+
+module extrude_face(some_text, font_scale, vertical_offset, height, multiplier, do_draw_text, offset_four, extrude_multiplier = 1,
+                    do_draw_svg = false, svg_file = "", svg_rotation = 0, svg_scale = 1, svg_offset = 0) {
+  *echo("\n\nextrude_face", some_text=some_text, font_scale=font_scale, vertical_offset=vertical_offset, height=height, multiplier=multiplier,
+        do_draw_text=do_draw_text, offset_four=offset_four, extrude_multiplier=extrude_multiplier, do_draw_svg=do_draw_svg, svg_file=svg_file, 
+        svg_rotation=svg_rotation, svg_scale=svg_scale, svg_offset=svg_offset, "\n");
+
+  if (do_draw_svg && svg_file) {
+    render_svg(svg_file, svg_rotation, svg_scale, svg_offset, true);
+  }
+
+  if (do_draw_text) {
+    render_text(some_text, font_scale, vertical_offset, height, multiplier, do_draw_text, offset_four, extrude_multiplier);
+  } 
+}
+
+module extrude_text_prev(some_text, font_scale, vertical_offset, height, multiplier, do_draw_text, offset_four, extrude_multiplier = 1) {
   if (svg_overlay) {
     render_svg(svg_overlay, 0, 1, svg_path_offset, do_draw_text);
   }
 
-  if (svg_path) {
+  if (draw_svg && svg_path) {
     extension = len(search(".", some_text)) == 0 ? ".svg" : "svg";
     svg_file = join([svg_path, "/", some_text, extension]);
-    render_svg(svg_file, 0, 1, svg_path_offset, do_draw_text);
+    render_svg(svg_file, 0, .35, svg_path_offset, do_draw_text);
   } else {
     if (do_draw_text) {
       if (show_bounding_box) {
@@ -49,11 +107,15 @@ module extrude_text(some_text, font_scale, vertical_offset, height, multiplier, 
           extrude_it();
        } else
         extrude_it();
-    } else echo("Skipping text");
+    } else {
+      if (inset_faces) {
+
+      } else echo("Skipping text");
+    }
   }
 
   module extrude_it() {
-    depth = make_face_text_deeper ? extrude_depth * extrude_multiplier : extrude_depth;
+    depth = make_face_text_deeper ? text_extrude_depth * extrude_multiplier : text_extrude_depth;
     size = height * multiplier * font_scale / 100;
     has_period = len(search(".", some_text)) > 0;
     two_digits = len(some_text) == 2 && !has_period;
@@ -62,7 +124,7 @@ module extrude_text(some_text, font_scale, vertical_offset, height, multiplier, 
 
     x = (some_text == "4") ? offset_four : (has_period ? period_spacing / 3: (two_digits ? 2*(spacing - 1) : 0));
 
-    echo("rendering text: ", some_text, size, height, multiplier);
+//    echo("rendering text: ", some_text, size, height, multiplier);
     translate([x, vertical_offset * multiplier, -depth + 1])
       linear_extrude(height = depth + 1, $fn=extrude_quality)
         text(text = some_text, size = size, valign = "center", halign = "center", spacing = spacing, font = font);    
